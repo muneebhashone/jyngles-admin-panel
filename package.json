@@ -1,10 +1,10 @@
 {
   "name": "jyngles",
   "author": "admin",
-  "licence": "MIT",
   "version": "1.0.0",
-  "private": false,
+  "private": true,
   "baseURL": "https://demo7.1stopwebsitesolution.com/jynglesadmin",
+  "homepage":"/jynglesadmin/",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
