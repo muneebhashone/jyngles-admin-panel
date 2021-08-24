@@ -15,9 +15,18 @@ import {
   Typography,
   IconButton
 } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import getInitials from 'src/utils/getInitials';
+
+const useStyles = makeStyles(() => (
+  {
+    title: {
+      textTransform: 'capitalize'
+    },
+  }
+));
 
 const CategoriesListResults = ({ customers, ...rest }) => {
   const [selectedCustomerIds, setSelectedCustomerIds] = useState([]);
@@ -25,12 +34,13 @@ const CategoriesListResults = ({ customers, ...rest }) => {
   const [page, setPage] = useState(0);
   const [startPoint, setStartPoint] = useState(0);
   const [endPoint, setEndPoint] = useState(0);
+  const classes = useStyles();
 
   const handleSelectAll = (event) => {
     let newSelectedCustomerIds;
 
     if (event.target.checked) {
-      newSelectedCustomerIds = customers.map((customer) => customer.id);
+      newSelectedCustomerIds = customers.map((customer) => customer._id);
     } else {
       newSelectedCustomerIds = [];
     }
@@ -86,6 +96,10 @@ const CategoriesListResults = ({ customers, ...rest }) => {
     console.log('startPoint:', startPoint);
   };
 
+  const handleDelete = (id) => {
+    console.log(id);
+  };
+
   useEffect(() => { setEndPoint(limit); }, [limit]);
 
   return (
@@ -114,13 +128,13 @@ const CategoriesListResults = ({ customers, ...rest }) => {
               {customers.slice(startPoint, endPoint).map((customer) => (
                 <TableRow
                   hover
-                  key={customer.id}
-                  selected={selectedCustomerIds.indexOf(customer.id) !== -1}
+                  key={customer._id}
+                  selected={selectedCustomerIds.indexOf(customer._id) !== -1}
                 >
                   <TableCell padding="checkbox">
                     <Checkbox
-                      checked={selectedCustomerIds.indexOf(customer.id) !== -1}
-                      onChange={(event) => handleSelectOne(event, customer.id)}
+                      checked={selectedCustomerIds.indexOf(customer._id) !== -1}
+                      onChange={(event) => handleSelectOne(event, customer._id)}
                       value="true"
                     />
                   </TableCell>
@@ -131,10 +145,10 @@ const CategoriesListResults = ({ customers, ...rest }) => {
                         display: 'flex'
                       }}
                     >
-                      <Avatar src={customer.avatarUrl} sx={{ mr: 2 }}>
+                      <Avatar src={customer.icon} sx={{ mr: 2 }}>
                         {getInitials(customer.name)}
                       </Avatar>
-                      <Typography color="textPrimary" variant="body1">
+                      <Typography classes={{ root: classes.title }} color="textPrimary" variant="body1">
                         {customer.name}
                       </Typography>
                     </Box>
@@ -143,7 +157,7 @@ const CategoriesListResults = ({ customers, ...rest }) => {
                     <IconButton color="primary" aria-label="upload picture" component="span">
                       <EditIcon />
                     </IconButton>
-                    <IconButton color="primary" aria-label="upload picture" component="span">
+                    <IconButton onClick={() => handleDelete(customer._id)} color="primary" aria-label="upload picture" component="span">
                       <DeleteIcon />
                     </IconButton>
                   </TableCell>

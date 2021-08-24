@@ -119,6 +119,7 @@ const CustomerListResults = ({ customers, ...rest }) => {
                   hover
                   key={customer.id}
                   selected={selectedCustomerIds.indexOf(customer.id) !== -1}
+                  style={{ cursor: 'pointer' }}
                 >
                   <TableCell padding="checkbox">
                     <Checkbox
