@@ -1,33 +1,33 @@
 import { useEffect } from 'react';
-import { Link as RouterLink, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {
-  Avatar,
   Box,
   Divider,
   Drawer,
   Hidden,
   List,
-  Typography
+  Typography,
+  Button
 } from '@material-ui/core';
-import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+// import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import {
   // AlertCircle as AlertCircleIcon,
   // BarChart as BarChartIcon,
-  Lock as LockIcon,
+  // Lock as LockIcon,
   // Settings as SettingsIcon,
   ShoppingBag as ShoppingBagIcon,
-  User as UserIcon,
+  // User as UserIcon,
   // UserPlus as UserPlusIcon,
   Users as UsersIcon
 } from 'react-feather';
 import NavItem from './NavItem';
 
-const user = {
-  avatar: '/static/images/avatars/avatar_6.png',
-  jobTitle: 'Admin',
-  name: 'John Doe'
-};
+// const user = {
+//   avatar: '/static/images/avatars/avatar_6.png',
+//   jobTitle: 'Admin',
+//   name: 'John Doe'
+// };
 
 const items = [
   // {
@@ -44,27 +44,27 @@ const items = [
     href: '/app/categories',
     icon: ShoppingBagIcon,
     title: 'Categories'
-  },
+  }
   // {
   //   href: '/app/products',
   //   icon: ShoppingBagIcon,
   //   title: 'Products'
   // },
-  {
-    href: '/app/account',
-    icon: UserIcon,
-    title: 'Account'
-  },
+  // {
+  //   href: '/app/account',
+  //   icon: UserIcon,
+  //   title: 'Account'
+  // },
   // {
   //   href: '/app/settings',
   //   icon: SettingsIcon,
   //   title: 'Settings'
   // },
-  {
-    href: '/login',
-    icon: LockIcon,
-    title: 'Logout'
-  },
+  // {
+  //   href: '/logout',
+  //   icon: LockIcon,
+  //   title: 'Logout'
+  // }
   // {
   //   href: '/register',
   //   icon: UserPlusIcon,
@@ -79,6 +79,14 @@ const items = [
 
 const DashboardSidebar = ({ onMobileClose, openMobile }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    if (localStorage.getItem('currentUser')) {
+      localStorage.removeItem('currentUser');
+      navigate('/login', { replace: true });
+    }
+  };
 
   useEffect(() => {
     if (openMobile && onMobileClose) {
@@ -102,7 +110,7 @@ const DashboardSidebar = ({ onMobileClose, openMobile }) => {
           p: 2
         }}
       >
-        <Avatar
+        {/* <Avatar
           component={RouterLink}
           sx={{
             cursor: 'pointer',
@@ -112,19 +120,13 @@ const DashboardSidebar = ({ onMobileClose, openMobile }) => {
           to="/app/account"
         >
           <AccountCircleIcon />
-        </Avatar>
-        <Typography
-          color="textPrimary"
-          variant="h5"
-        >
-          {user.name}
+        </Avatar> */}
+        <Typography color="textPrimary" variant="h5">
+          Admin
         </Typography>
-        <Typography
-          color="textSecondary"
-          variant="body2"
-        >
+        {/* <Typography color="textSecondary" variant="body2">
           {user.jobTitle}
-        </Typography>
+        </Typography> */}
       </Box>
       <Divider />
       <Box sx={{ p: 2 }}>
@@ -138,6 +140,13 @@ const DashboardSidebar = ({ onMobileClose, openMobile }) => {
             />
           ))}
         </List>
+        <Button
+          fullWidth
+          onClick={handleLogout}
+          style={{ textTransform: 'capitalize' }}
+        >
+          Logout
+        </Button>
       </Box>
       <Box sx={{ flexGrow: 1 }} />
     </Box>
@@ -186,7 +195,7 @@ DashboardSidebar.propTypes = {
 };
 
 DashboardSidebar.defaultProps = {
-  onMobileClose: () => { },
+  onMobileClose: () => {},
   openMobile: false
 };
 

@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import * as Yup from 'yup';
@@ -9,9 +11,30 @@ import {
   TextField,
   Typography
 } from '@material-ui/core';
+import { adminLogin as ADMIN_LOGIN } from 'src/GraphQL/Mutations';
+import { useMutation } from '@apollo/client';
 
 const Login = () => {
   const navigate = useNavigate();
+  const [adminLogin, { data, loading, error }] = useMutation(ADMIN_LOGIN);
+
+  const handleLogin = (values) => {
+    const loginAdmin = async () => {
+      const { data } = await adminLogin({
+        variables: { email: values.email, password: values.password }
+      });
+      localStorage.setItem('currentUser', JSON.stringify(data.adminLogin));
+      navigate('/app/customers', { replace: true });
+      location.reload();
+    };
+    loginAdmin();
+
+    useEffect(() => {
+      if (localStorage.getItem('currentUser')) {
+        navigate('/app/customers', { replace: true });
+      }
+    }, [localStorage.getItem('currentUser')]);
+  };
 
   return (
     <>
@@ -30,15 +53,19 @@ const Login = () => {
         <Container maxWidth="sm">
           <Formik
             initialValues={{
-              email: 'example@email.com',
-              password: 'Password123'
+              email: '',
+              password: ''
             }}
             validationSchema={Yup.object().shape({
-              email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
+              email: Yup.string()
+                .email('Must be a valid email')
+                .max(255)
+                .required('Email is required'),
               password: Yup.string().max(255).required('Password is required')
             })}
-            onSubmit={() => {
-              navigate('/app/customers', { replace: true });
+            onSubmit={(values) => {
+              handleLogin(values);
+              // navigate('/app/customers', { replace: true });
             }}
           >
             {({
@@ -52,10 +79,7 @@ const Login = () => {
             }) => (
               <form onSubmit={handleSubmit}>
                 <Box sx={{ mb: 3 }}>
-                  <Typography
-                    color="textPrimary"
-                    variant="h2"
-                  >
+                  <Typography color="textPrimary" variant="h2">
                     Sign in
                   </Typography>
                 </Box>

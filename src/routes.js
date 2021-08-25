@@ -10,6 +10,7 @@ import NotFound from 'src/pages/NotFound';
 import ProductList from 'src/pages/ProductList';
 import Register from 'src/pages/Register';
 import Settings from 'src/pages/Settings';
+import Logout from 'src/pages/Logout';
 
 const routes = [
   {
@@ -30,6 +31,7 @@ const routes = [
     element: <MainLayout />,
     children: [
       { path: 'login', element: <Login /> },
+      { path: 'logout', element: <Logout /> },
       { path: 'register', element: <Register /> },
       { path: '404', element: <NotFound /> },
       { path: '/', element: <Navigate to="/login" /> },

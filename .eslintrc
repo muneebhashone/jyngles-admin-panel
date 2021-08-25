@@ -19,12 +19,16 @@
     "max-len": "off",
     "no-console": "off",
     "no-plusplus": "off",
-    "react/forbid-prop-types": "off",
+    "react/forbid-prop-types": "on",
     "react/jsx-filename-extension": "off",
     "react/jsx-props-no-spreading": "off",
     "react/react-in-jsx-scope": "off",
     "react/require-default-props": "off",
     "linebreak-style": ["error", "windows"],
-    "no-underscore-dangle": "off"
+    "no-underscore-dangle": "off",
+    "no-unused-vars": "off",
+    "operation-linebreak": "off",
+    "react/prop-types": "off",
+    "eol-last": "off"
   }
 }

@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import {
   Box,
   Button,
@@ -9,47 +11,39 @@ import {
 } from '@material-ui/core';
 import { Search as SearchIcon } from 'react-feather';
 
-const CustomerListToolbar = (props) => (
-  <Box {...props}>
-    <Box
-      sx={{
-        display: 'flex',
-        justifyContent: 'flex-end'
-      }}
-    >
-      <Button
-        color="primary"
-        variant="contained"
-      >
-        Add User
-      </Button>
+const CustomerListToolbar = (props) => {
+  return (
+    <Box {...props}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'flex-end'
+        }}
+      ></Box>
+      <Box sx={{ mt: 3 }}>
+        <Card>
+          <CardContent>
+            <Box sx={{ maxWidth: 500 }}>
+              <TextField
+                fullWidth
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SvgIcon fontSize="small" color="action">
+                        <SearchIcon />
+                      </SvgIcon>
+                    </InputAdornment>
+                  )
+                }}
+                placeholder="Search User"
+                variant="outlined"
+              />
+            </Box>
+          </CardContent>
+        </Card>
+      </Box>
     </Box>
-    <Box sx={{ mt: 3 }}>
-      <Card>
-        <CardContent>
-          <Box sx={{ maxWidth: 500 }}>
-            <TextField
-              fullWidth
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SvgIcon
-                      fontSize="small"
-                      color="action"
-                    >
-                      <SearchIcon />
-                    </SvgIcon>
-                  </InputAdornment>
-                )
-              }}
-              placeholder="Search User"
-              variant="outlined"
-            />
-          </Box>
-        </CardContent>
-      </Card>
-    </Box>
-  </Box>
-);
+  );
+};
 
 export default CustomerListToolbar;

@@ -1,9 +1,11 @@
+/* eslint-disable */
+
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import {
-  Avatar,
+  // Avatar,
   Box,
   Card,
   Checkbox,
@@ -16,7 +18,9 @@ import {
   Typography,
   Button
 } from '@material-ui/core';
-import getInitials from 'src/utils/getInitials';
+import { editUserStatus as EDIT_USER_STATUS } from 'src/GraphQL/Mutations';
+import { useMutation } from '@apollo/client';
+// import getInitials from 'src/utils/getInitials';
 
 const CustomerListResults = ({ customers, ...rest }) => {
   const [selectedCustomerIds, setSelectedCustomerIds] = useState([]);
@@ -24,12 +28,14 @@ const CustomerListResults = ({ customers, ...rest }) => {
   const [page, setPage] = useState(0);
   const [startPoint, setStartPoint] = useState(0);
   const [endPoint, setEndPoint] = useState(0);
+  const [editUserStatus, { data, loading, error }] =
+    useMutation(EDIT_USER_STATUS);
 
   const handleSelectAll = (event) => {
     let newSelectedCustomerIds;
 
     if (event.target.checked) {
-      newSelectedCustomerIds = customers.map((customer) => customer.id);
+      newSelectedCustomerIds = customers.map((customer) => customer._id);
     } else {
       newSelectedCustomerIds = [];
     }
@@ -85,7 +91,17 @@ const CustomerListResults = ({ customers, ...rest }) => {
     console.log('startPoint:', startPoint);
   };
 
-  useEffect(() => { setEndPoint(limit); }, [limit]);
+  const handleUserStatus = (email) => {
+    const editStatus = async () => {
+      const response = await editUserStatus({ variables: { email: email } });
+      location.reload();
+    };
+    editStatus();
+  };
+
+  useEffect(() => {
+    setEndPoint(limit);
+  }, [limit]);
 
   return (
     <Card {...rest}>
@@ -99,17 +115,17 @@ const CustomerListResults = ({ customers, ...rest }) => {
                     checked={selectedCustomerIds.length === customers.length}
                     color="primary"
                     indeterminate={
-                      selectedCustomerIds.length > 0
-                      && selectedCustomerIds.length < customers.length
+                      selectedCustomerIds.length > 0 &&
+                      selectedCustomerIds.length < customers.length
                     }
                     onChange={handleSelectAll}
                   />
                 </TableCell>
                 <TableCell>Name</TableCell>
                 <TableCell>Email</TableCell>
-                <TableCell>Location</TableCell>
                 <TableCell>Phone</TableCell>
-                <TableCell>Registration date</TableCell>
+                <TableCell>Registration Date</TableCell>
+                <TableCell>Status</TableCell>
                 <TableCell style={{ textAlign: 'center' }}>Action</TableCell>
               </TableRow>
             </TableHead>
@@ -117,14 +133,14 @@ const CustomerListResults = ({ customers, ...rest }) => {
               {customers.slice(startPoint, endPoint).map((customer) => (
                 <TableRow
                   hover
-                  key={customer.id}
-                  selected={selectedCustomerIds.indexOf(customer.id) !== -1}
+                  key={customer._id}
+                  selected={selectedCustomerIds.indexOf(customer._id) !== -1}
                   style={{ cursor: 'pointer' }}
                 >
                   <TableCell padding="checkbox">
                     <Checkbox
-                      checked={selectedCustomerIds.indexOf(customer.id) !== -1}
-                      onChange={(event) => handleSelectOne(event, customer.id)}
+                      checked={selectedCustomerIds.indexOf(customer._id) !== -1}
+                      onChange={(event) => handleSelectOne(event, customer._id)}
                       value="true"
                     />
                   </TableCell>
@@ -135,24 +151,30 @@ const CustomerListResults = ({ customers, ...rest }) => {
                         display: 'flex'
                       }}
                     >
-                      <Avatar src={customer.avatarUrl} sx={{ mr: 2 }}>
+                      {/* <Avatar src={customer.avatarUrl} sx={{ mr: 2 }}>
                         {getInitials(customer.name)}
-                      </Avatar>
+                      </Avatar> */}
                       <Typography color="textPrimary" variant="body1">
-                        {customer.name}
+                        {customer.name ? customer.name : 'No Name'}
                       </Typography>
                     </Box>
                   </TableCell>
-                  <TableCell>{customer.email}</TableCell>
                   <TableCell>
-                    {`${customer.address.city}, ${customer.address.state}, ${customer.address.country}`}
+                    {customer.email ? customer.email : 'No Email'}
                   </TableCell>
-                  <TableCell>{customer.phone}</TableCell>
                   <TableCell>
-                    {moment(customer.createdAt).format('DD/MM/YYYY')}
+                    {customer.phone ? customer.phone : 'No Phone Number'}
+                  </TableCell>
+                  <TableCell>
+                    {moment(new Date(+customer.createdAt)).format('DD/MM/YYYY')}
+                  </TableCell>
+                  <TableCell>
+                    {customer.is_active ? 'Active' : 'Disabled'}
                   </TableCell>
                   <TableCell style={{ textAlign: 'center' }}>
-                    <Button>Disable</Button>
+                    <Button onClick={() => handleUserStatus(customer.email)}>
+                      {customer.is_active ? 'DISABLE' : 'ENABLE'}
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}

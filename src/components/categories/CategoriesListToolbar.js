@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useState } from 'react';
 import {
   Box,
@@ -8,14 +9,20 @@ import {
   InputAdornment,
   SvgIcon,
   Modal,
-  Grid,
+  Grid
   // Input,
   // FormControl,
   // InputLabel
 } from '@material-ui/core';
+import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
-import { CloudinaryUploadPreset, CloudinaryUploadUrl } from 'src/components/config/config';
+import {
+  CloudinaryUploadPreset,
+  CloudinaryUploadUrl
+} from 'src/components/config/config';
 import { Search as SearchIcon } from 'react-feather';
+import { createCategory as CREATE_CATEGORY } from 'src/GraphQL/Mutations';
+import { useMutation } from '@apollo/client';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -24,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.background.paper,
     boxShadow: theme.shadows[1],
     padding: theme.spacing(3, 4, 3),
-    borderRadius: 8,
+    borderRadius: 8
   },
   modalRoot: {
     display: 'flex',
@@ -37,6 +44,9 @@ const CategoriesListToolbar = (props) => {
   const [open, setOpen] = useState(false);
   const [icon, setIcon] = useState('');
   const [categoryName, setCategoryName] = useState('');
+  // eslint-disable-next-line operator-linebreak
+  const [createCategory, { data, loading, error }] =
+    useMutation(CREATE_CATEGORY);
   const classes = useStyles();
 
   const handleOpen = () => {
@@ -51,16 +61,24 @@ const CategoriesListToolbar = (props) => {
     event.preventDefault();
     const uploadToCloudinary = async () => {
       const formData = new FormData();
-      formData.append('file', icon[1]);
+      formData.append('file', icon[0]);
       formData.append('upload_preset', CloudinaryUploadPreset);
-      const response = await fetch(CloudinaryUploadUrl, {
-        method: 'POST',
-        body: JSON.stringify(formData)
+      const response = await axios.post(CloudinaryUploadUrl, formData);
+      console.log(response.data.url);
+      createCategory({
+        variables: { name: categoryName, icon: response.data.url }
       });
-      console.log(response);
     };
     uploadToCloudinary();
-    console.log('Category Name: ', categoryName);
+    if (loading) {
+      console.log('Submitting...');
+    }
+    if (error) {
+      console.log('Error occured');
+    }
+    if (data) {
+      console.log(data);
+    }
   };
 
   return (
@@ -71,11 +89,7 @@ const CategoriesListToolbar = (props) => {
           justifyContent: 'flex-end'
         }}
       >
-        <Button
-          color="primary"
-          variant="contained"
-          onClick={handleOpen}
-        >
+        <Button color="primary" variant="contained" onClick={handleOpen}>
           Add Category
         </Button>
         <Modal
@@ -84,19 +98,48 @@ const CategoriesListToolbar = (props) => {
           classes={{ root: classes.modalRoot }}
         >
           <div className={classes.paper}>
-            <form onSubmit={(event) => handleSubmit(event)} className={classes.root} noValidate autoComplete="off">
+            <form
+              onSubmit={(event) => handleSubmit(event)}
+              className={classes.root}
+              noValidate
+              autoComplete="off"
+            >
               <Grid container spacing={2}>
                 <Grid item md={12}>
-                  <Button style={{ height: '50px' }} fullWidth variant="outlined" component="label">
-                    Upload Icon
-                    <input onChange={(event) => setIcon(event.target.files)} encType="multipart/form-data" type="file" id="upload-icon" multiple={false} name="category-icon" accept="image/png, image/jpeg" hidden />
+                  <Button
+                    style={{ height: '50px' }}
+                    fullWidth
+                    variant="outlined"
+                    component="label"
+                  >
+                    {icon ? 'Selected' : 'Upload Icon'}
+                    <input
+                      onChange={(event) => setIcon(event.target.files)}
+                      encType="multipart/form-data"
+                      type="file"
+                      id="upload-icon"
+                      multiple={false}
+                      name="category-icon"
+                      accept="image/png, image/jpeg"
+                      hidden
+                    />
                   </Button>
                 </Grid>
                 <Grid item md={12}>
-                  <TextField onChange={(event) => setCategoryName(event.target.value)} fullWidth name="category-name" label="Category Name" />
+                  <TextField
+                    onChange={(event) => setCategoryName(event.target.value)}
+                    fullWidth
+                    name="category-name"
+                    label="Category Name"
+                  />
                 </Grid>
                 <Grid item md={12}>
-                  <Button type="submit" style={{ height: '50px' }} fullWidth variant="contained">
+                  <Button
+                    type="submit"
+                    style={{ height: '50px' }}
+                    fullWidth
+                    variant="contained"
+                  >
                     Add Category
                   </Button>
                 </Grid>
@@ -105,7 +148,7 @@ const CategoriesListToolbar = (props) => {
           </div>
         </Modal>
       </Box>
-      <Box sx={{ mt: 3 }}>
+      {/* <Box sx={{ mt: 3 }}>
         <Card>
           <CardContent>
             <Box sx={{ maxWidth: 500 }}>
@@ -114,10 +157,7 @@ const CategoriesListToolbar = (props) => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SvgIcon
-                        fontSize="small"
-                        color="action"
-                      >
+                      <SvgIcon fontSize="small" color="action">
                         <SearchIcon />
                       </SvgIcon>
                     </InputAdornment>
@@ -129,7 +169,7 @@ const CategoriesListToolbar = (props) => {
             </Box>
           </CardContent>
         </Card>
-      </Box>
+      </Box> */}
     </Box>
   );
 };
