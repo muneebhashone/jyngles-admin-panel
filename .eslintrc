@@ -19,7 +19,7 @@
     "max-len": "off",
     "no-console": "off",
     "no-plusplus": "off",
-    "react/forbid-prop-types": "on",
+    "react/forbid-prop-types": 0,
     "react/jsx-filename-extension": "off",
     "react/jsx-props-no-spreading": "off",
     "react/react-in-jsx-scope": "off",

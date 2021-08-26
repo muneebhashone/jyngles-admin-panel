@@ -1,5 +1,6 @@
 /* eslint-disable */
 
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import * as Yup from 'yup';
@@ -13,19 +14,34 @@ import {
 } from '@material-ui/core';
 import { adminLogin as ADMIN_LOGIN } from 'src/GraphQL/Mutations';
 import { useMutation } from '@apollo/client';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Login = () => {
   const navigate = useNavigate();
   const [adminLogin, { data, loading, error }] = useMutation(ADMIN_LOGIN);
+  const notify = () =>
+    toast('Invalid Credentials, Please try again', {
+      style: {
+        backgroundColor: 'red',
+        color: 'white'
+      },
+      hideProgressBar: true
+    });
 
   const handleLogin = (values) => {
     const loginAdmin = async () => {
-      const { data } = await adminLogin({
-        variables: { email: values.email, password: values.password }
-      });
-      localStorage.setItem('currentUser', JSON.stringify(data.adminLogin));
-      navigate('/app/customers', { replace: true });
-      location.reload();
+      try {
+        const { data } = await adminLogin({
+          variables: { email: values.email, password: values.password }
+        });
+        localStorage.setItem('currentUser', JSON.stringify(data.adminLogin));
+        navigate('/app/customers', { replace: true });
+        location.reload();
+      } catch (err) {
+        console.log(err.message);
+        notify();
+      }
     };
     loginAdmin();
 
@@ -112,7 +128,6 @@ const Login = () => {
                 <Box sx={{ py: 2 }}>
                   <Button
                     color="primary"
-                    disabled={isSubmitting}
                     fullWidth
                     size="large"
                     type="submit"
@@ -125,6 +140,7 @@ const Login = () => {
             )}
           </Formik>
         </Container>
+        <ToastContainer />
       </Box>
     </>
   );

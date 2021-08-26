@@ -145,6 +145,11 @@ const CategoriesListResults = ({ customers, ...rest }) => {
   const handleEditSubmit = (event) => {
     event.preventDefault();
 
+    if (editCat.name === '' || editCat.name === null) {
+      alert('Category name should not be empty');
+      return;
+    }
+
     if (!updateIcon) {
       const updateCategoryWithoutIcon = async () => {
         const response = await editCategory({

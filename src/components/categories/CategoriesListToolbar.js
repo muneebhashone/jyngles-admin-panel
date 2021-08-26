@@ -20,6 +20,7 @@ import {
   CloudinaryUploadPreset,
   CloudinaryUploadUrl
 } from 'src/components/config/config';
+import { useNavigate } from 'react-router';
 import { Search as SearchIcon } from 'react-feather';
 import { createCategory as CREATE_CATEGORY } from 'src/GraphQL/Mutations';
 import { useMutation } from '@apollo/client';
@@ -47,6 +48,7 @@ const CategoriesListToolbar = (props) => {
   // eslint-disable-next-line operator-linebreak
   const [createCategory, { data, loading, error }] =
     useMutation(CREATE_CATEGORY);
+  const navigate = useNavigate();
   const classes = useStyles();
 
   const handleOpen = () => {
@@ -59,15 +61,24 @@ const CategoriesListToolbar = (props) => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    if (icon === '') {
+      alert('Please upload icon');
+      return;
+    }
+    if (categoryName === '') {
+      alert('Category is required');
+      return;
+    }
     const uploadToCloudinary = async () => {
       const formData = new FormData();
       formData.append('file', icon[0]);
       formData.append('upload_preset', CloudinaryUploadPreset);
       const response = await axios.post(CloudinaryUploadUrl, formData);
       console.log(response.data.url);
-      createCategory({
+      const responseCreate = await createCategory({
         variables: { name: categoryName, icon: response.data.url }
       });
+      navigate('/app/categories', { replace: true });
     };
     uploadToCloudinary();
     if (loading) {

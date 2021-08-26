@@ -1,6 +1,6 @@
 /* eslint-disable */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useReducer } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -93,8 +93,12 @@ const CustomerListResults = ({ customers, ...rest }) => {
 
   const handleUserStatus = (email) => {
     const editStatus = async () => {
-      const response = await editUserStatus({ variables: { email: email } });
-      location.reload();
+      try {
+        const response = await editUserStatus({ variables: { email: email } });
+        location.reload();
+      } catch (err) {
+        console.log(err.message);
+      }
     };
     editStatus();
   };
