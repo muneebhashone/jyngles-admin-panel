@@ -20,6 +20,8 @@ import {
 } from '@material-ui/core';
 import { editUserStatus as EDIT_USER_STATUS } from 'src/GraphQL/Mutations';
 import { useMutation } from '@apollo/client';
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css';
 // import getInitials from 'src/utils/getInitials';
 
 const CustomerListResults = ({ customers, ...rest }) => {
@@ -30,6 +32,25 @@ const CustomerListResults = ({ customers, ...rest }) => {
   const [endPoint, setEndPoint] = useState(0);
   const [editUserStatus, { data, loading, error }] =
     useMutation(EDIT_USER_STATUS);
+
+  const confirmDisableOrEnable = (emailToDisable, isActive) => {
+    confirmAlert({
+      title: 'Are you sure?',
+      message: `Are you sure you want to ${
+        isActive ? 'Disable' : 'Enable'
+      } this user`,
+      buttons: [
+        {
+          label: 'Yes',
+          onClick: () => handleUserStatus(emailToDisable)
+        },
+        {
+          label: 'No',
+          onClick: () => {}
+        }
+      ]
+    });
+  };
 
   const handleSelectAll = (event) => {
     let newSelectedCustomerIds;
@@ -176,7 +197,14 @@ const CustomerListResults = ({ customers, ...rest }) => {
                     {customer.is_active ? 'Active' : 'Disabled'}
                   </TableCell>
                   <TableCell style={{ textAlign: 'center' }}>
-                    <Button onClick={() => handleUserStatus(customer.email)}>
+                    <Button
+                      onClick={() => {
+                        confirmDisableOrEnable(
+                          customer.email,
+                          customer.is_active
+                        );
+                      }}
+                    >
                       {customer.is_active ? 'DISABLE' : 'ENABLE'}
                     </Button>
                   </TableCell>
