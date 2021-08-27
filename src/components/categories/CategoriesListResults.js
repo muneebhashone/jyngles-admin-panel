@@ -23,7 +23,6 @@ import {
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import EditIcon from '@material-ui/icons/Edit';
-import DeleteIcon from '@material-ui/icons/Delete';
 import getInitials from 'src/utils/getInitials';
 // import Alert from 'src/components/alert/Alert';
 import { editCategory as EDIT_CATEGORY } from 'src/GraphQL/Mutations';
@@ -68,9 +67,6 @@ const CategoriesListResults = ({ customers, ...rest }) => {
   const [editCategory, { data, loading, error }] = useMutation(EDIT_CATEGORY);
   const classes = useStyles();
   const [modalOpen, setModalOpen] = useState(false);
-  // const [catDelete, setCatDelete] = useState(null);
-  // const [deleteCategory, { data, loading, error }] =
-  //   useMutation(DELETE_CATEGORY);
 
   const handleSelectAll = (event) => {
     let newSelectedCustomerIds;
@@ -131,11 +127,6 @@ const CategoriesListResults = ({ customers, ...rest }) => {
     console.log('endPoint:', endPoint);
     console.log('startPoint:', startPoint);
   };
-
-  // const handleDelete = (id) => {
-  //   setAlert(true);
-  //   setCatDelete(id);
-  // };
 
   const handleEdit = (id, name, icon) => {
     setEditCat({ id, name, icon });

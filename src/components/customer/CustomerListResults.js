@@ -20,9 +20,10 @@ import { editUserStatus as EDIT_USER_STATUS } from 'src/GraphQL/Mutations';
 import { useMutation } from '@apollo/client';
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
+import limitWord from 'src/utils/limitSentence';
 // import getInitials from 'src/utils/getInitials';
 
-const CustomerListResults = ({ customers, ...rest }) => {
+const CustomerListResults = ({ customers, refetch, ...rest }) => {
   const [selectedCustomerIds, setSelectedCustomerIds] = useState([]);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
@@ -37,8 +38,10 @@ const CustomerListResults = ({ customers, ...rest }) => {
         const response = await editUserStatus({
           variables: { email: email }
         });
-        if (loading) console.log('loading...');
-        location.reload();
+        if (response.data.editUserStatus.result === true) {
+          console.log('Success');
+        }
+        refetch();
       } catch (err) {
         console.log(err.message);
       }
@@ -178,7 +181,9 @@ const CustomerListResults = ({ customers, ...rest }) => {
                         {getInitials(customer.name)}
                       </Avatar> */}
                       <Typography color="textPrimary" variant="body1">
-                        {customer.name ? customer.name : 'No Name'}
+                        {customer.name
+                          ? limitWord(customer.name, 35)
+                          : 'No Name'}
                       </Typography>
                     </Box>
                   </TableCell>
@@ -186,7 +191,9 @@ const CustomerListResults = ({ customers, ...rest }) => {
                     {customer.email ? customer.email : 'No Email'}
                   </TableCell>
                   <TableCell>
-                    {customer.phone ? customer.phone : 'No Phone Number'}
+                    {customer.phone
+                      ? limitWord(customer.phone, 25)
+                      : 'No Phone Number'}
                   </TableCell>
                   <TableCell>
                     {moment(new Date(+customer.createdAt)).format('DD/MM/YYYY')}

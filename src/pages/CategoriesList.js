@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
 import CategoriesListResults from 'src/components/categories/CategoriesListResults';
@@ -8,10 +8,14 @@ import { getAllCategories } from 'src/GraphQL/Queries';
 import LoadingSpinner from 'src/components/ui/loading-spinner';
 
 const CategoriesList = () => {
-  const { data, loading } = useQuery(getAllCategories);
+  const { data, loading, refetch } = useQuery(getAllCategories);
+  const [newData, setNewData] = useState(null);
 
   useEffect(() => {
-    console.log(data);
+    if (!loading) {
+      setNewData(data.getAllCategories.map((dataItem) => dataItem).reverse());
+      console.log(newData);
+    }
   }, [data]);
 
   return (
@@ -27,12 +31,12 @@ const CategoriesList = () => {
         }}
       >
         <Container maxWidth={false}>
-          <CategoriesListToolbar />
+          <CategoriesListToolbar refetch={refetch} />
           <Box sx={{ pt: 3 }}>
-            {loading ? (
+            {newData === null ? (
               <LoadingSpinner />
             ) : (
-              <CategoriesListResults customers={data.getAllCategories} />
+              <CategoriesListResults customers={newData} />
             )}
           </Box>
         </Container>

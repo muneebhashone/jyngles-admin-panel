@@ -1,29 +1,15 @@
 /* eslint-disable */
 import { useState } from 'react';
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  TextField,
-  InputAdornment,
-  SvgIcon,
-  Modal,
-  Grid
-  // Input,
-  // FormControl,
-  // InputLabel
-} from '@material-ui/core';
+import { Box, Button, TextField, Modal, Grid } from '@material-ui/core';
 import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
 import {
   CloudinaryUploadPreset,
   CloudinaryUploadUrl
 } from 'src/components/config/config';
-import { useNavigate } from 'react-router';
-import { Search as SearchIcon } from 'react-feather';
 import { createCategory as CREATE_CATEGORY } from 'src/GraphQL/Mutations';
 import { useMutation } from '@apollo/client';
+import { ToastContainer, toast } from 'react-toastify';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -42,14 +28,22 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const CategoriesListToolbar = (props) => {
+  const { refetch } = props;
   const [open, setOpen] = useState(false);
   const [icon, setIcon] = useState('');
   const [categoryName, setCategoryName] = useState('');
   // eslint-disable-next-line operator-linebreak
   const [createCategory, { data, loading, error }] =
     useMutation(CREATE_CATEGORY);
-  const navigate = useNavigate();
   const classes = useStyles();
+  const notify = (categoryName) =>
+    toast(`${categoryName} Added`, {
+      style: {
+        backgroundColor: '#78CA42',
+        color: 'white'
+      },
+      hideProgressBar: true
+    });
 
   const handleOpen = () => {
     setOpen(true);
@@ -78,7 +72,13 @@ const CategoriesListToolbar = (props) => {
       const responseCreate = await createCategory({
         variables: { name: categoryName, icon: response.data.url }
       });
-      navigate('/admin/categories', { replace: true });
+      console.log(responseCreate);
+      if (responseCreate.data.createCategory.name) {
+        setIcon('');
+        setCategoryName('');
+        notify();
+        refetch();
+      }
     };
     uploadToCloudinary();
     if (loading) {
@@ -139,6 +139,7 @@ const CategoriesListToolbar = (props) => {
                 <Grid item md={12}>
                   <TextField
                     onChange={(event) => setCategoryName(event.target.value)}
+                    value={categoryName}
                     fullWidth
                     name="category-name"
                     label="Category Name"
@@ -159,28 +160,7 @@ const CategoriesListToolbar = (props) => {
           </div>
         </Modal>
       </Box>
-      {/* <Box sx={{ mt: 3 }}>
-        <Card>
-          <CardContent>
-            <Box sx={{ maxWidth: 500 }}>
-              <TextField
-                fullWidth
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SvgIcon fontSize="small" color="action">
-                        <SearchIcon />
-                      </SvgIcon>
-                    </InputAdornment>
-                  )
-                }}
-                placeholder="Search Category"
-                variant="outlined"
-              />
-            </Box>
-          </CardContent>
-        </Card>
-      </Box> */}
+      <ToastContainer />
     </Box>
   );
 };

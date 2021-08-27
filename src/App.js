@@ -6,6 +6,7 @@ import 'src/mixins/chartjs';
 import theme from 'src/theme';
 import routes from 'src/routes';
 import UserProvider from 'src/context/Context';
+import 'react-toastify/dist/ReactToastify.css';
 
 const App = () => {
   const routing = useRoutes(routes);

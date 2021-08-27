@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
 import CustomerListResults from 'src/components/customer/CustomerListResults';
@@ -9,11 +9,11 @@ import { useQuery } from '@apollo/client';
 import { getAllUsers } from 'src/GraphQL/Queries';
 
 const CustomerList = () => {
-  const { data, loading } = useQuery(getAllUsers);
+  const { data, loading, error, refetch } = useQuery(getAllUsers);
 
   useEffect(() => {
     console.log(data);
-  }, [loading]);
+  }, [data]);
 
   return (
     <>
@@ -33,7 +33,10 @@ const CustomerList = () => {
             {loading ? (
               <LoadingSpinner />
             ) : (
-              <CustomerListResults customers={data.getAllUsers} />
+              <CustomerListResults
+                customers={data.getAllUsers}
+                refetch={refetch}
+              />
             )}
           </Box>
         </Container>
