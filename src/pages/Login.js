@@ -36,7 +36,7 @@ const Login = () => {
           variables: { email: values.email, password: values.password }
         });
         localStorage.setItem('currentUser', JSON.stringify(data.adminLogin));
-        navigate('/app/customers', { replace: true });
+        navigate('/admin/customers', { replace: true });
         location.reload();
       } catch (err) {
         console.log(err.message);
@@ -47,7 +47,7 @@ const Login = () => {
 
     useEffect(() => {
       if (localStorage.getItem('currentUser')) {
-        navigate('/app/customers', { replace: true });
+        navigate('/admin/customers', { replace: true });
       }
     }, [localStorage.getItem('currentUser')]);
   };

@@ -1,16 +1,19 @@
 /* eslint-disable */
-
+import { useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
 import CustomerListResults from 'src/components/customer/CustomerListResults';
 import CustomerListToolbar from 'src/components/customer/CustomerListToolbar';
-import customers from 'src/__mocks__/customers';
 import LoadingSpinner from 'src/components/ui/loading-spinner';
 import { useQuery } from '@apollo/client';
 import { getAllUsers } from 'src/GraphQL/Queries';
 
 const CustomerList = () => {
-  const { data, loading, error } = useQuery(getAllUsers);
+  const { data, loading } = useQuery(getAllUsers);
+
+  useEffect(() => {
+    console.log(data);
+  }, [loading]);
 
   return (
     <>

@@ -4,35 +4,33 @@ import MainLayout from 'src/components/MainLayout';
 import Account from 'src/pages/Account';
 import CustomerList from 'src/pages/CustomerList';
 import CategoriesList from 'src/pages/CategoriesList';
-import Dashboard from 'src/pages/Dashboard';
+// import Dashboard from 'src/pages/Dashboard';
 import Login from 'src/pages/Login';
 import NotFound from 'src/pages/NotFound';
-import ProductList from 'src/pages/ProductList';
-import Register from 'src/pages/Register';
-import Settings from 'src/pages/Settings';
-import Logout from 'src/pages/Logout';
+// import ProductList from 'src/pages/ProductList';
+// import Register from 'src/pages/Register';
+// import Settings from 'src/pages/Settings';
 
 const routes = [
   {
-    path: 'app',
+    path: 'admin',
     element: <DashboardLayout />,
     children: [
       { path: 'account', element: <Account /> },
       { path: 'customers', element: <CustomerList /> },
-      { path: 'dashboard', element: <Dashboard /> },
+      // { path: 'dashboard', element: <Dashboard /> },
       { path: 'categories', element: <CategoriesList /> },
-      { path: 'products', element: <ProductList /> },
-      { path: 'settings', element: <Settings /> },
+      // { path: 'products', element: <ProductList /> },
+      // { path: 'settings', element: <Settings /> },
       { path: '*', element: <Navigate to="/404" /> }
     ]
   },
   {
-    path: '/',
+    path: 'admin',
     element: <MainLayout />,
     children: [
       { path: 'login', element: <Login /> },
-      { path: 'logout', element: <Logout /> },
-      { path: 'register', element: <Register /> },
+      // { path: 'register', element: <Register /> },
       { path: '404', element: <NotFound /> },
       { path: '/', element: <Navigate to="/login" /> },
       { path: '*', element: <Navigate to="/404" /> }

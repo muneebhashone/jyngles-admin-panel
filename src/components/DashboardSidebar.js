@@ -12,7 +12,7 @@ import {
 } from '@material-ui/core';
 // import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import {
-  // AlertCircle as AlertCircleIcon,
+  AlertCircle as AlertCircleIcon,
   // BarChart as BarChartIcon,
   // Lock as LockIcon,
   // Settings as SettingsIcon,
@@ -36,12 +36,12 @@ const items = [
   //   title: 'Dashboard'
   // },
   {
-    href: '/app/customers',
+    href: '/admin/customers',
     icon: UsersIcon,
     title: 'Users'
   },
   {
-    href: '/app/categories',
+    href: '/admin/categories',
     icon: ShoppingBagIcon,
     title: 'Categories'
   }
@@ -71,7 +71,7 @@ const items = [
   //   title: 'Register'
   // },
   // {
-  //   href: '/404',
+  //   href: '/admin/404',
   //   icon: AlertCircleIcon,
   //   title: 'Error'
   // }
@@ -84,7 +84,7 @@ const DashboardSidebar = ({ onMobileClose, openMobile }) => {
   const handleLogout = () => {
     if (localStorage.getItem('currentUser')) {
       localStorage.removeItem('currentUser');
-      navigate('/login', { replace: true });
+      navigate('/admin/login', { replace: true });
     }
   };
 

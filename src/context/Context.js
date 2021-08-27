@@ -12,9 +12,9 @@ const UserProvider = ({ children }) => {
   useEffect(() => {
     if (localStorage.getItem('currentUser')) {
       setCurrentUser(JSON.parse(localStorage.getItem('currentUser')));
-      navigate('/app/customers', { replace: true });
+      navigate('/admin/customers', { replace: true });
     } else {
-      navigate('/login', { replace: true });
+      navigate('/admin/login', { replace: true });
     }
   }, [localStorage.getItem('currentUser')]);
 

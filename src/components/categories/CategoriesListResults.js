@@ -184,9 +184,6 @@ const CategoriesListResults = ({ customers, ...rest }) => {
       };
       updateCategoryWithIcon();
     }
-
-    // console.log(editCat);
-    // console.log(updateIcon);
   };
 
   const handleCategoryStatus = (id, name, icon, isActive) => {

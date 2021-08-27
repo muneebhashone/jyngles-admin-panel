@@ -1,11 +1,9 @@
 /* eslint-disable */
 
-import { useState, useEffect, useReducer } from 'react';
-import PropTypes from 'prop-types';
+import React, { useState, useEffect } from 'react';
 import moment from 'moment';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import {
-  // Avatar,
   Box,
   Card,
   Checkbox,
@@ -33,7 +31,22 @@ const CustomerListResults = ({ customers, ...rest }) => {
   const [editUserStatus, { data, loading, error }] =
     useMutation(EDIT_USER_STATUS);
 
-  const confirmDisableOrEnable = (emailToDisable, isActive) => {
+  const handleUserStatus = (email) => {
+    const editStatus = async () => {
+      try {
+        const response = await editUserStatus({
+          variables: { email: email }
+        });
+        if (loading) console.log('loading...');
+        location.reload();
+      } catch (err) {
+        console.log(err.message);
+      }
+    };
+    editStatus();
+  };
+
+  const confirmDisableOrEnable = (emailToChange, isActive) => {
     confirmAlert({
       title: 'Are you sure?',
       message: `Are you sure you want to ${
@@ -42,7 +55,7 @@ const CustomerListResults = ({ customers, ...rest }) => {
       buttons: [
         {
           label: 'Yes',
-          onClick: () => handleUserStatus(emailToDisable)
+          onClick: () => handleUserStatus(emailToChange)
         },
         {
           label: 'No',
@@ -107,21 +120,6 @@ const CustomerListResults = ({ customers, ...rest }) => {
       setStartPoint(startPointNum);
       setEndPoint(startPointNum + limit);
     }
-
-    console.log('endPoint:', endPoint);
-    console.log('startPoint:', startPoint);
-  };
-
-  const handleUserStatus = (email) => {
-    const editStatus = async () => {
-      try {
-        const response = await editUserStatus({ variables: { email: email } });
-        location.reload();
-      } catch (err) {
-        console.log(err.message);
-      }
-    };
-    editStatus();
   };
 
   useEffect(() => {
@@ -198,12 +196,12 @@ const CustomerListResults = ({ customers, ...rest }) => {
                   </TableCell>
                   <TableCell style={{ textAlign: 'center' }}>
                     <Button
-                      onClick={() => {
+                      onClick={() =>
                         confirmDisableOrEnable(
                           customer.email,
                           customer.is_active
-                        );
-                      }}
+                        )
+                      }
                     >
                       {customer.is_active ? 'DISABLE' : 'ENABLE'}
                     </Button>
@@ -225,10 +223,6 @@ const CustomerListResults = ({ customers, ...rest }) => {
       />
     </Card>
   );
-};
-
-CustomerListResults.propTypes = {
-  customers: PropTypes.array.isRequired
 };
 
 export default CustomerListResults;

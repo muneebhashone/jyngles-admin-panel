@@ -39,17 +39,20 @@ const Register = () => {
               password: '',
               policy: false
             }}
-            validationSchema={
-              Yup.object().shape({
-                email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-                firstName: Yup.string().max(255).required('First name is required'),
-                lastName: Yup.string().max(255).required('Last name is required'),
-                password: Yup.string().max(255).required('password is required'),
-                policy: Yup.boolean().oneOf([true], 'This field must be checked')
-              })
-            }
+            validationSchema={Yup.object().shape({
+              email: Yup.string()
+                .email('Must be a valid email')
+                .max(255)
+                .required('Email is required'),
+              firstName: Yup.string()
+                .max(255)
+                .required('First name is required'),
+              lastName: Yup.string().max(255).required('Last name is required'),
+              password: Yup.string().max(255).required('password is required'),
+              policy: Yup.boolean().oneOf([true], 'This field must be checked')
+            })}
             onSubmit={() => {
-              navigate('/app/dashboard', { replace: true });
+              navigate('/admin/dashboard', { replace: true });
             }}
           >
             {({
@@ -63,10 +66,7 @@ const Register = () => {
             }) => (
               <form onSubmit={handleSubmit}>
                 <Box sx={{ mb: 3 }}>
-                  <Typography
-                    color="textPrimary"
-                    variant="h2"
-                  >
+                  <Typography color="textPrimary" variant="h2">
                     Create new account
                   </Typography>
                   <Typography
@@ -139,12 +139,8 @@ const Register = () => {
                     name="policy"
                     onChange={handleChange}
                   />
-                  <Typography
-                    color="textSecondary"
-                    variant="body1"
-                  >
-                    I have read the
-                    {' '}
+                  <Typography color="textSecondary" variant="body1">
+                    I have read the{' '}
                     <Link
                       color="primary"
                       component={RouterLink}
@@ -157,9 +153,7 @@ const Register = () => {
                   </Typography>
                 </Box>
                 {Boolean(touched.policy && errors.policy) && (
-                  <FormHelperText error>
-                    {errors.policy}
-                  </FormHelperText>
+                  <FormHelperText error>{errors.policy}</FormHelperText>
                 )}
                 <Box sx={{ py: 2 }}>
                   <Button
@@ -173,17 +167,9 @@ const Register = () => {
                     Sign up now
                   </Button>
                 </Box>
-                <Typography
-                  color="textSecondary"
-                  variant="body1"
-                >
-                  Have an account?
-                  {' '}
-                  <Link
-                    component={RouterLink}
-                    to="/login"
-                    variant="h6"
-                  >
+                <Typography color="textSecondary" variant="body1">
+                  Have an account?{' '}
+                  <Link component={RouterLink} to="/login" variant="h6">
                     Sign in
                   </Link>
                 </Typography>

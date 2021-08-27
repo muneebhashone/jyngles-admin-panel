@@ -29,6 +29,17 @@ export const getCategory = gql`
   }
 `;
 
+export const getAllCategories = gql`
+  query {
+    getAllCategories {
+      _id
+      name
+      icon
+      is_active
+    }
+  }
+`;
+
 export const getAllUsers = gql`
   query {
     getAllUsers {

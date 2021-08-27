@@ -78,7 +78,7 @@ const CategoriesListToolbar = (props) => {
       const responseCreate = await createCategory({
         variables: { name: categoryName, icon: response.data.url }
       });
-      navigate('/app/categories', { replace: true });
+      navigate('/admin/categories', { replace: true });
     };
     uploadToCloudinary();
     if (loading) {

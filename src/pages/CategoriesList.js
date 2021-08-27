@@ -4,11 +4,11 @@ import { Box, Container } from '@material-ui/core';
 import CategoriesListResults from 'src/components/categories/CategoriesListResults';
 import CategoriesListToolbar from 'src/components/categories/CategoriesListToolbar';
 import { useQuery } from '@apollo/client';
-import { getCategory } from 'src/GraphQL/Queries';
+import { getAllCategories } from 'src/GraphQL/Queries';
 import LoadingSpinner from 'src/components/ui/loading-spinner';
 
 const CategoriesList = () => {
-  const { data, loading } = useQuery(getCategory);
+  const { data, loading } = useQuery(getAllCategories);
 
   useEffect(() => {
     console.log(data);
@@ -29,7 +29,11 @@ const CategoriesList = () => {
         <Container maxWidth={false}>
           <CategoriesListToolbar />
           <Box sx={{ pt: 3 }}>
-            { loading ? <LoadingSpinner /> : <CategoriesListResults customers={data.categories} /> }
+            {loading ? (
+              <LoadingSpinner />
+            ) : (
+              <CategoriesListResults customers={data.getAllCategories} />
+            )}
           </Box>
         </Container>
       </Box>
