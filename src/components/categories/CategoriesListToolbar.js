@@ -74,9 +74,10 @@ const CategoriesListToolbar = (props) => {
       });
       console.log(responseCreate);
       if (responseCreate.data.createCategory.name) {
+        const newCategoryName = responseCreate.data.createCategory.name;
         setIcon('');
         setCategoryName('');
-        notify();
+        notify(newCategoryName);
         refetch();
       }
     };
