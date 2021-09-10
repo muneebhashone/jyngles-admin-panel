@@ -27,7 +27,7 @@ const CategoriesList = () => {
 
     if (!loading && search) {
       if (search !== '') {
-        const regex = new RegExp(string.sanitize(search), 'gi');
+        const regex = new RegExp(string.sanitize.keepSpace(search), 'gi');
         setNewData((selectData) =>
           selectData.filter((category) => category.name.match(regex))
         );
