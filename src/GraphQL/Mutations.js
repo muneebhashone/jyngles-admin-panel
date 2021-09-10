@@ -2,10 +2,12 @@ import { gql } from '@apollo/client';
 
 // eslint-disable-next-line import/prefer-default-export
 export const createCategory = gql`
-  mutation createCategory($name: String!, $icon: String) {
-    createCategory(categoryInput: { name: $name, icon: $icon }) {
+  mutation createCategory($name: String!, $icon: String, $type: String) {
+    createCategory(categoryInput: { name: $name, icon: $icon, type: $type }) {
       name
       icon
+      type
+      _id
     }
   }
 `;
@@ -16,6 +18,7 @@ export const editCategory = gql`
     $name: String!
     $icon: String!
     $is_active: Boolean
+    $type: String
   ) {
     editCategory(
       editCategoryInput: {
@@ -23,12 +26,14 @@ export const editCategory = gql`
         name: $name
         icon: $icon
         is_active: $is_active
+        type: $type
       }
     ) {
       _id
       name
       icon
       is_active
+      type
     }
   }
 `;

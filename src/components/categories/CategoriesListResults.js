@@ -22,6 +22,7 @@ import {
   Modal
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import SelectComponent from '../select/SelectComponent';
 import EditIcon from '@material-ui/icons/Edit';
 import getInitials from 'src/utils/getInitials';
 // import Alert from 'src/components/alert/Alert';
@@ -32,6 +33,7 @@ import {
   CloudinaryUploadUrl,
   CloudinaryUploadPreset
 } from 'src/components/config/config';
+import { ToastContainer, toast } from 'react-toastify';
 
 const useStyles = makeStyles((theme) => ({
   title: {
@@ -61,12 +63,21 @@ const CategoriesListResults = ({ customers, ...rest }) => {
   const [editCat, setEditCat] = useState({
     id: null,
     name: null,
-    icon: null
+    icon: null,
+    type: null
   });
   const [updateIcon, setUpdateIcon] = useState(false);
   const [editCategory, { data, loading, error }] = useMutation(EDIT_CATEGORY);
   const classes = useStyles();
   const [modalOpen, setModalOpen] = useState(false);
+  const notify = () =>
+    toast(`Category Updated`, {
+      style: {
+        backgroundColor: '#78CA42',
+        color: 'white'
+      },
+      hideProgressBar: true
+    });
 
   const handleSelectAll = (event) => {
     let newSelectedCustomerIds;
@@ -128,8 +139,9 @@ const CategoriesListResults = ({ customers, ...rest }) => {
     console.log('startPoint:', startPoint);
   };
 
-  const handleEdit = (id, name, icon) => {
-    setEditCat({ id, name, icon });
+  const handleEdit = (customer) => {
+    const { _id: id, name, icon, type } = customer;
+    setEditCat({ id, name, icon, type });
     setModalOpen(true);
   };
 
@@ -148,9 +160,11 @@ const CategoriesListResults = ({ customers, ...rest }) => {
             id: String(editCat.id),
             name: editCat.name,
             icon: editCat.icon,
-            is_active: true
+            is_active: true,
+            type: editCat.type
           }
         });
+        notify();
         console.log(response);
       };
       updateCategoryWithoutIcon();
@@ -168,26 +182,38 @@ const CategoriesListResults = ({ customers, ...rest }) => {
             id: String(editCat.id),
             name: editCat.name,
             icon: response.data.url,
-            is_active: true
+            is_active: true,
+            type: editCat.type
           }
         });
+        notify();
         console.log('GraphQL Response:', resp);
       };
       updateCategoryWithIcon();
     }
   };
 
-  const handleCategoryStatus = (id, name, icon, isActive) => {
+  const handleSelectType = (value) => {
+    setEditCat({ ...editCat, type: value });
+    console.log(value);
+  };
+
+  const handleCategoryStatus = (category) => {
     const updateCategoryStatus = async () => {
-      const response = await editCategory({
-        variables: {
-          id: id,
-          name: name,
-          icon: icon,
-          is_active: !isActive
-        }
-      });
-      console.log(response);
+      try {
+        const response = await editCategory({
+          variables: {
+            id: category._id,
+            name: category.name,
+            icon: category.icon,
+            is_active: !category.is_active,
+            type: category.type || 'income'
+          }
+        });
+        console.log(response);
+      } catch (err) {
+        console.log(err);
+      }
     };
     updateCategoryStatus();
   };
@@ -219,6 +245,7 @@ const CategoriesListResults = ({ customers, ...rest }) => {
                   />
                 </TableCell>
                 <TableCell>Name</TableCell>
+                <TableCell>Type</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell style={{ textAlign: 'right' }}>Edit</TableCell>
                 <TableCell>Action</TableCell>
@@ -264,6 +291,22 @@ const CategoriesListResults = ({ customers, ...rest }) => {
                         display: 'flex'
                       }}
                     >
+                      <Typography
+                        classes={{ root: classes.title }}
+                        color="textPrimary"
+                        variant="body1"
+                      >
+                        {customer.type ? customer.type : 'No Type'}
+                      </Typography>
+                    </Box>
+                  </TableCell>
+                  <TableCell>
+                    <Box
+                      sx={{
+                        alignItems: 'center',
+                        display: 'flex'
+                      }}
+                    >
                       <Typography color="textPrimary" variant="body1">
                         {customer.is_active ? 'Active' : 'Disabled'}
                       </Typography>
@@ -274,24 +317,13 @@ const CategoriesListResults = ({ customers, ...rest }) => {
                       color="primary"
                       aria-label="upload picture"
                       component="span"
-                      onClick={() =>
-                        handleEdit(customer._id, customer.name, customer.icon)
-                      }
+                      onClick={() => handleEdit(customer)}
                     >
                       <EditIcon />
                     </IconButton>
                   </TableCell>
                   <TableCell>
-                    <Button
-                      onClick={() =>
-                        handleCategoryStatus(
-                          customer._id,
-                          customer.name,
-                          customer.icon,
-                          customer.is_active
-                        )
-                      }
-                    >
+                    <Button onClick={() => handleCategoryStatus(customer)}>
                       {customer.is_active ? 'Disable' : 'Enable'}
                     </Button>
                   </TableCell>
@@ -353,6 +385,13 @@ const CategoriesListResults = ({ customers, ...rest }) => {
                     />
                   </Grid>
                   <Grid item md={12}>
+                    <SelectComponent
+                      inputLabel="Type"
+                      handleOnSelect={handleSelectType}
+                      value={editCat.type}
+                    />
+                  </Grid>
+                  <Grid item md={12}>
                     <Button
                       type="submit"
                       style={{ height: '50px' }}
@@ -366,6 +405,7 @@ const CategoriesListResults = ({ customers, ...rest }) => {
               </form>
             </div>
           </Modal>
+          <ToastContainer />
         </Box>
       </PerfectScrollbar>
       <TablePagination

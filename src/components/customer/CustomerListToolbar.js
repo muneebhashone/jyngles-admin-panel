@@ -12,6 +12,7 @@ import {
 import { Search as SearchIcon } from 'react-feather';
 
 const CustomerListToolbar = (props) => {
+  const { handleCategorySearch } = props;
   return (
     <Box {...props}>
       <Box
@@ -20,12 +21,13 @@ const CustomerListToolbar = (props) => {
           justifyContent: 'flex-end'
         }}
       ></Box>
-      {/* <Box sx={{ mt: 3 }}>
+      <Box sx={{ mt: 3 }}>
         <Card>
           <CardContent>
             <Box sx={{ maxWidth: 500 }}>
               <TextField
                 fullWidth
+                onChange={(event) => handleCategorySearch(event.target.value)}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -41,7 +43,7 @@ const CustomerListToolbar = (props) => {
             </Box>
           </CardContent>
         </Card>
-      </Box> */}
+      </Box>
     </Box>
   );
 };

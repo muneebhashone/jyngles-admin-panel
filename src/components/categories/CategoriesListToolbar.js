@@ -1,12 +1,24 @@
 /* eslint-disable */
 import { useState } from 'react';
-import { Box, Button, TextField, Modal, Grid } from '@material-ui/core';
+import {
+  Box,
+  Button,
+  TextField,
+  Modal,
+  Grid,
+  Card,
+  CardContent,
+  InputAdornment,
+  SvgIcon
+} from '@material-ui/core';
+import { Search as SearchIcon } from 'react-feather';
 import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
 import {
   CloudinaryUploadPreset,
   CloudinaryUploadUrl
 } from 'src/components/config/config';
+import SelectComponent from '../select/SelectComponent';
 import { createCategory as CREATE_CATEGORY } from 'src/GraphQL/Mutations';
 import { useMutation } from '@apollo/client';
 import { ToastContainer, toast } from 'react-toastify';
@@ -28,10 +40,11 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const CategoriesListToolbar = (props) => {
-  const { refetch } = props;
+  const { refetch, handleCategorySearch } = props;
   const [open, setOpen] = useState(false);
   const [icon, setIcon] = useState('');
   const [categoryName, setCategoryName] = useState('');
+  const [categoryType, setCategoryType] = useState('');
   // eslint-disable-next-line operator-linebreak
   const [createCategory, { data, loading, error }] =
     useMutation(CREATE_CATEGORY);
@@ -60,7 +73,12 @@ const CategoriesListToolbar = (props) => {
       return;
     }
     if (categoryName === '') {
-      alert('Category is required');
+      alert('Category Name is required');
+      return;
+    }
+
+    if (categoryType === '') {
+      alert('Category Type is required');
       return;
     }
     const uploadToCloudinary = async () => {
@@ -70,7 +88,11 @@ const CategoriesListToolbar = (props) => {
       const response = await axios.post(CloudinaryUploadUrl, formData);
       console.log(response.data.url);
       const responseCreate = await createCategory({
-        variables: { name: categoryName, icon: response.data.url }
+        variables: {
+          name: categoryName,
+          icon: response.data.url,
+          type: categoryType
+        }
       });
       console.log(responseCreate);
       if (responseCreate.data.createCategory.name) {
@@ -147,6 +169,13 @@ const CategoriesListToolbar = (props) => {
                   />
                 </Grid>
                 <Grid item md={12}>
+                  <SelectComponent
+                    inputLabel="Type"
+                    handleOnSelect={(value) => setCategoryType(value)}
+                    value={categoryType}
+                  />
+                </Grid>
+                <Grid item md={12}>
                   <Button
                     type="submit"
                     style={{ height: '50px' }}
@@ -160,6 +189,29 @@ const CategoriesListToolbar = (props) => {
             </form>
           </div>
         </Modal>
+      </Box>
+      <Box sx={{ mt: 3 }}>
+        <Card>
+          <CardContent>
+            <Box sx={{ maxWidth: 500 }}>
+              <TextField
+                fullWidth
+                onChange={(event) => handleCategorySearch(event.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SvgIcon fontSize="small" color="action">
+                        <SearchIcon />
+                      </SvgIcon>
+                    </InputAdornment>
+                  )
+                }}
+                placeholder="Search Category"
+                variant="outlined"
+              />
+            </Box>
+          </CardContent>
+        </Card>
       </Box>
       <ToastContainer />
     </Box>

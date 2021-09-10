@@ -25,6 +25,7 @@ export const getCategory = gql`
       _id
       icon
       is_active
+      type
     }
   }
 `;
@@ -36,6 +37,7 @@ export const getAllCategories = gql`
       name
       icon
       is_active
+      type
     }
   }
 `;

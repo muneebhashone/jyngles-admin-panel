@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
@@ -6,17 +8,36 @@ import CategoriesListToolbar from 'src/components/categories/CategoriesListToolb
 import { useQuery } from '@apollo/client';
 import { getAllCategories } from 'src/GraphQL/Queries';
 import LoadingSpinner from 'src/components/ui/loading-spinner';
+import string from 'string-sanitizer';
 
 const CategoriesList = () => {
   const { data, loading, refetch } = useQuery(getAllCategories);
   const [newData, setNewData] = useState(null);
+  const [search, setSearch] = useState();
+
+  const handleSearch = (value) => {
+    setSearch(value);
+  };
 
   useEffect(() => {
     if (!loading) {
       setNewData(data.getAllCategories.map((dataItem) => dataItem).reverse());
       console.log(newData);
     }
-  }, [data]);
+
+    if (!loading && search) {
+      if (search !== '') {
+        const regex = new RegExp(string.sanitize(search), 'gi');
+        setNewData((selectData) =>
+          selectData.filter((category) => category.name.match(regex))
+        );
+      }
+
+      if (search === '') {
+        setNewData(data.getAllCategories.map((dataItem) => dataItem).reverse());
+      }
+    }
+  }, [data, search]);
 
   return (
     <>
@@ -31,7 +52,10 @@ const CategoriesList = () => {
         }}
       >
         <Container maxWidth={false}>
-          <CategoriesListToolbar refetch={refetch} />
+          <CategoriesListToolbar
+            refetch={refetch}
+            handleCategorySearch={handleSearch}
+          />
           <Box sx={{ pt: 3 }}>
             {newData === null ? (
               <LoadingSpinner />
