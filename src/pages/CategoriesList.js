@@ -6,12 +6,12 @@ import { Box, Container } from '@material-ui/core';
 import CategoriesListResults from 'src/components/categories/CategoriesListResults';
 import CategoriesListToolbar from 'src/components/categories/CategoriesListToolbar';
 import { useQuery } from '@apollo/client';
-import { getAllCategories } from 'src/GraphQL/Queries';
+import { getAllCategories, getCategory } from 'src/GraphQL/Queries';
 import LoadingSpinner from 'src/components/ui/loading-spinner';
 import string from 'string-sanitizer';
 
 const CategoriesList = () => {
-  const { data, loading, refetch } = useQuery(getAllCategories);
+  const { data, loading, refetch } = useQuery(getCategory);
   const [newData, setNewData] = useState(null);
   const [search, setSearch] = useState();
 
@@ -20,9 +20,12 @@ const CategoriesList = () => {
   };
 
   useEffect(() => {
+    console.log(data);
+  }, [data]);
+
+  useEffect(() => {
     if (!loading) {
-      setNewData(data.getAllCategories.map((dataItem) => dataItem).reverse());
-      console.log(newData);
+      setNewData(data.categories.map((dataItem) => dataItem).reverse());
     }
 
     if (!loading && search) {
@@ -34,7 +37,7 @@ const CategoriesList = () => {
       }
 
       if (search === '') {
-        setNewData(data.getAllCategories.map((dataItem) => dataItem).reverse());
+        setNewData(data.categories.map((dataItem) => dataItem).reverse());
       }
     }
   }, [data, search]);

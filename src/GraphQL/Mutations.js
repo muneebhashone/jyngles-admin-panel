@@ -2,12 +2,28 @@ import { gql } from '@apollo/client';
 
 // eslint-disable-next-line import/prefer-default-export
 export const createCategory = gql`
-  mutation createCategory($name: String!, $icon: String, $type: String) {
-    createCategory(categoryInput: { name: $name, icon: $icon, type: $type }) {
+  mutation createCategory(
+    $name: String!
+    $icon: String
+    $type: String
+    $sub_cats: [String]!
+  ) {
+    createCategory(
+      categoryInput: {
+        name: $name
+        icon: $icon
+        type: $type
+        sub_cats: $sub_cats
+      }
+    ) {
       name
       icon
       type
       _id
+      subCats {
+        _id
+        name
+      }
     }
   }
 `;
@@ -19,6 +35,7 @@ export const editCategory = gql`
     $icon: String!
     $is_active: Boolean
     $type: String
+    $sub_cats: [String]!
   ) {
     editCategory(
       editCategoryInput: {
@@ -27,6 +44,7 @@ export const editCategory = gql`
         icon: $icon
         is_active: $is_active
         type: $type
+        sub_cats: $sub_cats
       }
     ) {
       _id
@@ -40,8 +58,9 @@ export const editCategory = gql`
 
 export const deleteCategory = gql`
   mutation deleteCategory($id: String!) {
-    deleteCategory(id: $id) {
+    deleteCategory(deleteCategoryInput: { id: $id }) {
       _id
+      name
     }
   }
 `;
@@ -122,6 +141,71 @@ export const adminLogin = gql`
       userId
       name
       token
+    }
+  }
+`;
+
+export const createSubCategory = gql`
+  mutation createSubCategory(
+    $name: String!
+    $icon: String
+    $type: String
+    $parent_cat_id: String!
+  ) {
+    createSubCategory(
+      subCategoryInput: {
+        name: $name
+        icon: $icon
+        type: $type
+        parent_cat_id: $parent_cat_id
+      }
+    ) {
+      _id
+      name
+      icon
+      is_active
+      subCats {
+        _id
+        name
+      }
+    }
+  }
+`;
+
+export const editSubCategory = gql`
+  mutation editSubCategory(
+    $id: String!
+    $name: String!
+    $icon: String
+    $type: String
+    $parent_cat_id: String!
+  ) {
+    editSubCategory(
+      editSubCategoryInput: {
+        id: $id
+        name: $name
+        icon: $icon
+        type: $type
+        parent_cat_id: $parent_cat_id
+      }
+    ) {
+      _id
+      name
+      icon
+      is_active
+      subCats {
+        _id
+        name
+      }
+    }
+  }
+`;
+
+export const deleteSubCategory = gql`
+  mutation deleteSubCategory($id: String!) {
+    deleteSubCategory(deleteSubCategoryInput: { id: $id }) {
+      _id
+      name
     }
   }
 `;

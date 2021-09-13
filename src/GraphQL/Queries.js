@@ -19,13 +19,19 @@ export const myGoals = gql`
 `;
 
 export const getCategory = gql`
-  query categories {
-    categories {
-      name
+  query ($type: String) {
+    categories(type: $type) {
       _id
+      name
       icon
-      is_active
       type
+      is_active
+      subCats {
+        _id
+        name
+        type
+        icon
+      }
     }
   }
 `;

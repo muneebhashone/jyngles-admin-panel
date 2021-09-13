@@ -134,9 +134,6 @@ const CategoriesListResults = ({ customers, ...rest }) => {
       setStartPoint(startPointNum);
       setEndPoint(startPointNum + limit);
     }
-
-    console.log('endPoint:', endPoint);
-    console.log('startPoint:', startPoint);
   };
 
   const handleEdit = (customer) => {
@@ -165,7 +162,6 @@ const CategoriesListResults = ({ customers, ...rest }) => {
           }
         });
         notify();
-        console.log(response);
       };
       updateCategoryWithoutIcon();
     }
@@ -176,7 +172,7 @@ const CategoriesListResults = ({ customers, ...rest }) => {
         formData.append('file', editCat.icon);
         formData.append('upload_preset', CloudinaryUploadPreset);
         const response = await axios.post(CloudinaryUploadUrl, formData);
-        console.log('Image Url:', response.data.url);
+
         const resp = await editCategory({
           variables: {
             id: String(editCat.id),
@@ -187,7 +183,6 @@ const CategoriesListResults = ({ customers, ...rest }) => {
           }
         });
         notify();
-        console.log('GraphQL Response:', resp);
       };
       updateCategoryWithIcon();
     }
@@ -195,7 +190,6 @@ const CategoriesListResults = ({ customers, ...rest }) => {
 
   const handleSelectType = (value) => {
     setEditCat({ ...editCat, type: value });
-    console.log(value);
   };
 
   const handleCategoryStatus = (category) => {
@@ -207,10 +201,10 @@ const CategoriesListResults = ({ customers, ...rest }) => {
             name: category.name,
             icon: category.icon,
             is_active: !category.is_active,
-            type: category.type || 'income'
+            type: category.type || 'income',
+            sub_cats: category.sub_cats || []
           }
         });
-        console.log(response);
       } catch (err) {
         console.log(err);
       }
