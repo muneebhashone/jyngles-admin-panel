@@ -4,6 +4,7 @@ import MainLayout from 'src/components/MainLayout';
 import Account from 'src/pages/Account';
 import CustomerList from 'src/pages/CustomerList';
 import CategoriesList from 'src/pages/CategoriesList';
+import SubCategoriesList from 'src/pages/SubCategoriesList';
 // import Dashboard from 'src/pages/Dashboard';
 import Login from 'src/pages/Login';
 import NotFound from 'src/pages/NotFound';
@@ -19,6 +20,7 @@ const routes = [
       { path: 'account', element: <Account /> },
       { path: 'customers', element: <CustomerList /> },
       // { path: 'dashboard', element: <Dashboard /> },
+      { path: 'categories/:id', element: <SubCategoriesList /> },
       { path: 'categories', element: <CategoriesList /> },
       // { path: 'products', element: <ProductList /> },
       // { path: 'settings', element: <Settings /> },

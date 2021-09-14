@@ -64,7 +64,7 @@ function AddCategoryForm({ refetchQuery, onSuccess }) {
       });
 
       if (responseCreate.data.createCategory.name) {
-        setIcon('');
+        // setIcon('');
         setCategoryName('');
         onSuccess();
         refetchQuery();

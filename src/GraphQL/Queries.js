@@ -44,6 +44,13 @@ export const getAllCategories = gql`
       icon
       is_active
       type
+      subCats {
+        _id
+        name
+        icon
+        type
+        is_active
+      }
     }
   }
 `;

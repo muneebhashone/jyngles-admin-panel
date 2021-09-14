@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import PerfectScrollbar from 'react-perfect-scrollbar';
-import { Link, useLocation } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import {
   Avatar,
   Box,
@@ -27,7 +27,11 @@ import SelectComponent from '../select/SelectComponent';
 import EditIcon from '@material-ui/icons/Edit';
 import getInitials from 'src/utils/getInitials';
 // import Alert from 'src/components/alert/Alert';
-import { editCategory as EDIT_CATEGORY } from 'src/GraphQL/Mutations';
+import uploadToCloudinary from 'src/utils/uploadToCloudinary';
+import {
+  editSubCategory as EDIT_SUB_CATEGORY,
+  deleteSubCategory as DELETE_SUB_CATEGORY
+} from 'src/GraphQL/Mutations';
 import { useMutation } from '@apollo/client';
 import axios from 'axios';
 import {
@@ -55,12 +59,14 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const CategoriesListResults = ({ customers, ...rest }) => {
+const SubCategoriesListResults = ({ customers, refetchQuery, ...rest }) => {
   const [selectedCustomerIds, setSelectedCustomerIds] = useState([]);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
   const [startPoint, setStartPoint] = useState(0);
   const [endPoint, setEndPoint] = useState(0);
+  const params = useParams();
+  console.log(params);
   const [editCat, setEditCat] = useState({
     id: null,
     name: null,
@@ -68,10 +74,14 @@ const CategoriesListResults = ({ customers, ...rest }) => {
     type: null
   });
   const [updateIcon, setUpdateIcon] = useState(false);
-  const [editCategory, { data, loading, error }] = useMutation(EDIT_CATEGORY);
+  const [editSubCategory, { data, loading, error }] =
+    useMutation(EDIT_SUB_CATEGORY);
+  const [
+    deleteSubCategory,
+    { data: deleteData, loading: deleteLoading, error: deleteError }
+  ] = useMutation(DELETE_SUB_CATEGORY);
   const classes = useStyles();
   const [modalOpen, setModalOpen] = useState(false);
-  const location = useLocation();
   const notify = () =>
     toast(`Category Updated`, {
       style: {
@@ -154,37 +164,44 @@ const CategoriesListResults = ({ customers, ...rest }) => {
 
     if (!updateIcon) {
       const updateCategoryWithoutIcon = async () => {
-        const response = await editCategory({
-          variables: {
-            id: String(editCat.id),
-            name: editCat.name,
-            icon: editCat.icon,
-            is_active: true,
-            type: editCat.type
-          }
-        });
-        notify();
+        try {
+          const response = await editSubCategory({
+            variables: {
+              id: String(editCat.id),
+              name: editCat.name,
+              icon: editCat.icon,
+              type: editCat.type,
+              parent_cat_id: params.id
+            }
+          });
+          notify();
+          refetchQuery();
+        } catch (err) {
+          console.log(err);
+        }
       };
       updateCategoryWithoutIcon();
     }
 
     if (updateIcon) {
       const updateCategoryWithIcon = async () => {
-        const formData = new FormData();
-        formData.append('file', editCat.icon);
-        formData.append('upload_preset', CloudinaryUploadPreset);
-        const response = await axios.post(CloudinaryUploadUrl, formData);
+        try {
+          const uploadLink = await uploadToCloudinary(editCat.icon);
 
-        const resp = await editCategory({
-          variables: {
-            id: String(editCat.id),
-            name: editCat.name,
-            icon: response.data.url,
-            is_active: true,
-            type: editCat.type
-          }
-        });
-        notify();
+          const resp = await editSubCategory({
+            variables: {
+              id: String(editCat.id),
+              name: editCat.name,
+              icon: uploadLink,
+              type: editCat.type,
+              parent_cat_id: params.id
+            }
+          });
+          notify();
+          refetchQuery();
+        } catch (err) {
+          console.log(err);
+        }
       };
       updateCategoryWithIcon();
     }
@@ -192,21 +209,18 @@ const CategoriesListResults = ({ customers, ...rest }) => {
 
   const handleSelectType = (value) => {
     setEditCat({ ...editCat, type: value });
+    console.log(value);
   };
 
   const handleCategoryStatus = (category) => {
     const updateCategoryStatus = async () => {
       try {
-        const response = await editCategory({
+        const response = await deleteSubCategory({
           variables: {
-            id: category._id,
-            name: category.name,
-            icon: category.icon,
-            is_active: !category.is_active,
-            type: category.type || 'income',
-            sub_cats: category.sub_cats || []
+            id: category._id
           }
         });
+        refetchQuery();
       } catch (err) {
         console.log(err);
       }
@@ -262,25 +276,23 @@ const CategoriesListResults = ({ customers, ...rest }) => {
                     />
                   </TableCell>
                   <TableCell>
-                    <Link to={`/admin/categories/${customer._id}`}>
-                      <Box
-                        sx={{
-                          alignItems: 'center',
-                          display: 'flex'
-                        }}
+                    <Box
+                      sx={{
+                        alignItems: 'center',
+                        display: 'flex'
+                      }}
+                    >
+                      <Avatar src={customer.icon} sx={{ mr: 2 }}>
+                        {getInitials(customer.name)}
+                      </Avatar>
+                      <Typography
+                        classes={{ root: classes.title }}
+                        color="textPrimary"
+                        variant="body1"
                       >
-                        <Avatar src={customer.icon} sx={{ mr: 2 }}>
-                          {getInitials(customer.name)}
-                        </Avatar>
-                        <Typography
-                          classes={{ root: classes.title }}
-                          color="textPrimary"
-                          variant="body1"
-                        >
-                          {customer.name}
-                        </Typography>
-                      </Box>
-                    </Link>
+                        {customer.name}
+                      </Typography>
+                    </Box>
                   </TableCell>
                   <TableCell>
                     <Box
@@ -322,7 +334,7 @@ const CategoriesListResults = ({ customers, ...rest }) => {
                   </TableCell>
                   <TableCell>
                     <Button onClick={() => handleCategoryStatus(customer)}>
-                      {customer.is_active ? 'Disable' : 'Enable'}
+                      Delete
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -419,8 +431,4 @@ const CategoriesListResults = ({ customers, ...rest }) => {
   );
 };
 
-CategoriesListResults.propTypes = {
-  customers: PropTypes.array.isRequired
-};
-
-export default CategoriesListResults;
+export default SubCategoriesListResults;

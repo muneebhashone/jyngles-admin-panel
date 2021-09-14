@@ -1,18 +1,20 @@
 /* eslint-disable */
 
 import React, { createContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export const UsersContext = createContext();
 
 const UserProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (localStorage.getItem('currentUser')) {
       setCurrentUser(JSON.parse(localStorage.getItem('currentUser')));
       navigate('/admin/customers', { replace: true });
+      console.log(location);
     } else {
       navigate('/admin/login', { replace: true });
     }

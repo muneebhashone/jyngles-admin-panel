@@ -1,9 +1,13 @@
 /* eslint-disable */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Grid, Button, TextField } from '@material-ui/core';
-import { createCategory as CREATE_CATEGORY } from 'src/GraphQL/Mutations';
-import { useMutation } from '@apollo/client';
+import {
+  getCategory as GET_CATEGORY,
+  getAllCategories as GET_ALL_CATEGORIES
+} from 'src/GraphQL/Queries';
+import { createSubCategory as CREATE_SUB_CATEGORY } from 'src/GraphQL/Mutations';
+import { useMutation, useQuery } from '@apollo/client';
 import SelectComponent from '../select/SelectComponent';
 import uploadToCloudinary from '../../utils/uploadToCloudinary';
 
@@ -22,14 +26,37 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function AddSubCategoryForm({ refetchQuery, onSuccess }) {
-  const [icon, setIcon] = useState('');
+  const [icon, setIcon] = useState(null);
   const [categoryName, setCategoryName] = useState('');
+  const [categoryParent, setCategoryParent] = useState('');
   const [categoryType, setCategoryType] = useState('');
-  const [createCategory, { data, loading, error }] =
-    useMutation(CREATE_CATEGORY);
+  const [selectMenuItems, setSelectMenuItems] = useState([]);
+  const [createSubCategory, { data, loading, error }] =
+    useMutation(CREATE_SUB_CATEGORY);
+  const {
+    data: parentCategoryData,
+    loading: parentCategoryLoading,
+    error: parentCategoryError
+  } = useQuery(GET_CATEGORY, { pollInterval: 500 });
+
+  useEffect(() => {
+    console.log(parentCategoryData);
+    if (!parentCategoryLoading) {
+      setSelectMenuItems(
+        parentCategoryData.categories.map((parentCat) => ({
+          label: parentCat.name,
+          value: parentCat._id
+        }))
+      );
+    }
+
+    if (parentCategoryError) {
+      console.log(parentCategoryError);
+    }
+  }, [parentCategoryData]);
 
   const formValidation = () => {
-    if (icon === '') {
+    if (icon === null) {
       alert('Please upload icon');
       return false;
     }
@@ -38,8 +65,13 @@ function AddSubCategoryForm({ refetchQuery, onSuccess }) {
       return false;
     }
 
+    if (categoryParent === '') {
+      alert('Parent category is required');
+      return false;
+    }
+
     if (categoryType === '') {
-      alert('Category Type is required');
+      alert('Category type is required');
       return false;
     }
 
@@ -54,17 +86,20 @@ function AddSubCategoryForm({ refetchQuery, onSuccess }) {
 
       const iconUrl = await uploadToCloudinary(icon[0]);
 
-      const responseCreate = await createCategory({
+      const responseCreate = await createSubCategory({
         variables: {
           name: categoryName,
           icon: iconUrl,
-          type: categoryType
+          type: categoryType,
+          parent_cat_id: categoryParent
         }
       });
 
-      if (responseCreate.data.createCategory.name) {
-        setIcon('');
+      if (responseCreate.data.createSubCategory.name) {
+        // setIcon(null);
         setCategoryName('');
+        // setCategoryType('');
+        // setCategoryParent('');
         onSuccess();
         refetchQuery();
       }
@@ -101,9 +136,13 @@ function AddSubCategoryForm({ refetchQuery, onSuccess }) {
               variant="outlined"
               component="label"
             >
-              {icon ? 'Selected' : 'Upload Icon'}
+              {icon !== null ? 'Selected' : 'Upload Icon'}
               <input
-                onChange={(event) => setIcon(event.target.files)}
+                defaultValue={icon}
+                onChange={(event) => {
+                  setIcon(event.target.files);
+                  console.log(event.target.files);
+                }}
                 encType="multipart/form-data"
                 type="file"
                 id="upload-icon"
@@ -128,6 +167,14 @@ function AddSubCategoryForm({ refetchQuery, onSuccess }) {
               inputLabel="Type"
               handleOnSelect={(value) => setCategoryType(value)}
               value={categoryType}
+            />
+          </Grid>
+          <Grid item md={12}>
+            <SelectComponent
+              inputLabel="Parent"
+              handleOnSelect={(value) => setCategoryParent(value)}
+              value={categoryParent}
+              menuItems={selectMenuItems}
             />
           </Grid>
           <Grid item md={12}>
