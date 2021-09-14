@@ -21,7 +21,6 @@ const CustomerList = () => {
   useEffect(() => {
     if (!loading) {
       setNewData(data.getAllUsers.map((dataItem) => dataItem));
-      console.log(newData);
     }
 
     if (!loading && search) {

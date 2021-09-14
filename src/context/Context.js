@@ -16,8 +16,6 @@ const UserProvider = ({ children }) => {
       if (location.pathname === '/admin/login') {
         navigate('/admin/customers', { replace: true });
       }
-
-      console.log(location);
     } else {
       navigate('/admin/login', { replace: true });
     }

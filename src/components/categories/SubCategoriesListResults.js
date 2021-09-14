@@ -66,7 +66,7 @@ const SubCategoriesListResults = ({ customers, refetchQuery, ...rest }) => {
   const [startPoint, setStartPoint] = useState(0);
   const [endPoint, setEndPoint] = useState(0);
   const params = useParams();
-  console.log(params);
+
   const [editCat, setEditCat] = useState({
     id: null,
     name: null,
@@ -209,7 +209,6 @@ const SubCategoriesListResults = ({ customers, refetchQuery, ...rest }) => {
 
   const handleSelectType = (value) => {
     setEditCat({ ...editCat, type: value });
-    console.log(value);
   };
 
   const handleCategoryStatus = (category) => {

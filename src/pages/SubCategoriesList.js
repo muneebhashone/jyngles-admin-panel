@@ -1,6 +1,7 @@
 /* eslint-disable */
 
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
 import SubCategoriesListResults from 'src/components/categories/SubCategoriesListResults';
@@ -9,15 +10,12 @@ import { useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
 import { getAllCategories } from 'src/GraphQL/Queries';
 import LoadingSpinner from 'src/components/ui/loading-spinner';
-import string from 'string-sanitizer';
 
 const SubCategoriesList = () => {
   const { data, loading, refetch } = useQuery(getAllCategories);
   const [newData, setNewData] = useState(null);
-  const [search, setSearch] = useState();
   const params = useParams();
-
-  console.log(params);
+  const navigate = useNavigate();
 
   const handleSearch = (value) => {
     setSearch(value);
@@ -25,6 +23,9 @@ const SubCategoriesList = () => {
 
   useEffect(() => {
     console.log(newData);
+    if (!loading && newData && !newData[0]) {
+      navigate('/admin/categories');
+    }
   }, [newData]);
 
   useEffect(() => {
@@ -37,24 +38,24 @@ const SubCategoriesList = () => {
       );
     }
 
-    if (!loading && search) {
-      if (search !== '') {
-        const regex = new RegExp(string.sanitize.keepSpace(search), 'gi');
-        setNewData((selectData) =>
-          selectData[0].filter((category) => category.name.match(regex))
-        );
-      }
+    // if (!loading && search) {
+    //   if (search !== '') {
+    //     const regex = new RegExp(string.sanitize.keepSpace(search), 'gi');
+    //     setNewData((selectData) =>
+    //       selectData[0].filter((category) => category.name.match(regex))
+    //     );
+    //   }
 
-      if (search === '') {
-        setNewData(
-          data.getAllCategories
-            .filter((dataItem) => dataItem._id === params.id)
-            .map((dataItem) => dataItem.subCats)
-            .reverse()
-        );
-      }
-    }
-  }, [data, search]);
+    //   if (search === '') {
+    //     setNewData(
+    //       data.getAllCategories
+    //         .filter((dataItem) => dataItem._id === params.id)
+    //         .map((dataItem) => dataItem.subCats)
+    //         .reverse()
+    //     );
+    //   }
+    // }
+  }, [data]);
 
   return (
     <>
@@ -70,8 +71,8 @@ const SubCategoriesList = () => {
       >
         <Container maxWidth={false}>
           <CategoriesListToolbar
-            refetch={refetch}
-            handleCategorySearch={handleSearch}
+            // refetch={refetch}
+            // handleCategorySearch={handleSearch}
             hideSearch
           />
           <Box sx={{ pt: 3 }}>

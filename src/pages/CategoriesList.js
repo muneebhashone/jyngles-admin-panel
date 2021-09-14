@@ -20,10 +20,6 @@ const CategoriesList = () => {
   };
 
   useEffect(() => {
-    console.log(newData);
-  }, [newData]);
-
-  useEffect(() => {
     if (!loading) {
       setNewData(data.getAllCategories.map((dataItem) => dataItem).reverse());
     }
