@@ -75,7 +75,7 @@ const SubCategoriesList = () => {
             hideSearch
           />
           <Box sx={{ pt: 3 }}>
-            {!newData ? (
+            {!newData || !newData[0] ? (
               <LoadingSpinner />
             ) : (
               <SubCategoriesListResults

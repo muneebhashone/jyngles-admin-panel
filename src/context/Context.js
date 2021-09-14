@@ -21,7 +21,7 @@ const UserProvider = ({ children }) => {
     } else {
       navigate('/admin/login', { replace: true });
     }
-  }, [localStorage.getItem('currentUser')]);
+  }, [location.pathname]);
 
   return (
     <UsersContext.Provider value={{ currentUser }}>
