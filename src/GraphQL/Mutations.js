@@ -35,7 +35,6 @@ export const editCategory = gql`
     $icon: String!
     $is_active: Boolean
     $type: String
-    $sub_cats: [String]!
   ) {
     editCategory(
       editCategoryInput: {
@@ -44,7 +43,6 @@ export const editCategory = gql`
         icon: $icon
         is_active: $is_active
         type: $type
-        sub_cats: $sub_cats
       }
     ) {
       _id

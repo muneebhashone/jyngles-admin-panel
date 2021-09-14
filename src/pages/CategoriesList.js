@@ -19,9 +19,9 @@ const CategoriesList = () => {
     setSearch(value);
   };
 
-  // useEffect(() => {
-  //   console.log(data);
-  // }, [data]);
+  useEffect(() => {
+    console.log(newData);
+  }, [newData]);
 
   useEffect(() => {
     if (!loading) {

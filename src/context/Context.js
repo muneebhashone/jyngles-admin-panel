@@ -13,7 +13,10 @@ const UserProvider = ({ children }) => {
   useEffect(() => {
     if (localStorage.getItem('currentUser')) {
       setCurrentUser(JSON.parse(localStorage.getItem('currentUser')));
-      navigate('/admin/customers', { replace: true });
+      if (location.pathname === '/admin/login') {
+        navigate('/admin/customers', { replace: true });
+      }
+
       console.log(location);
     } else {
       navigate('/admin/login', { replace: true });

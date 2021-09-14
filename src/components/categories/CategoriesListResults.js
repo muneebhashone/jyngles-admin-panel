@@ -26,6 +26,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import SelectComponent from '../select/SelectComponent';
 import EditIcon from '@material-ui/icons/Edit';
 import getInitials from 'src/utils/getInitials';
+import uploadToCloudinary from 'src/utils/uploadToCloudinary';
 // import Alert from 'src/components/alert/Alert';
 import { editCategory as EDIT_CATEGORY } from 'src/GraphQL/Mutations';
 import { useMutation } from '@apollo/client';
@@ -154,37 +155,42 @@ const CategoriesListResults = ({ customers, ...rest }) => {
 
     if (!updateIcon) {
       const updateCategoryWithoutIcon = async () => {
-        const response = await editCategory({
-          variables: {
-            id: String(editCat.id),
-            name: editCat.name,
-            icon: editCat.icon,
-            is_active: true,
-            type: editCat.type
-          }
-        });
-        notify();
+        try {
+          const response = await editCategory({
+            variables: {
+              id: String(editCat.id),
+              name: editCat.name,
+              icon: editCat.icon,
+              is_active: true,
+              type: editCat.type
+            }
+          });
+          notify();
+        } catch (err) {
+          console.log(err);
+        }
       };
       updateCategoryWithoutIcon();
     }
 
     if (updateIcon) {
       const updateCategoryWithIcon = async () => {
-        const formData = new FormData();
-        formData.append('file', editCat.icon);
-        formData.append('upload_preset', CloudinaryUploadPreset);
-        const response = await axios.post(CloudinaryUploadUrl, formData);
+        try {
+          const uploadLink = await uploadToCloudinary(editCat.icon);
 
-        const resp = await editCategory({
-          variables: {
-            id: String(editCat.id),
-            name: editCat.name,
-            icon: response.data.url,
-            is_active: true,
-            type: editCat.type
-          }
-        });
-        notify();
+          const resp = await editCategory({
+            variables: {
+              id: String(editCat.id),
+              name: editCat.name,
+              icon: uploadLink,
+              is_active: true,
+              type: editCat.type
+            }
+          });
+          notify();
+        } catch (err) {
+          console.log(err);
+        }
       };
       updateCategoryWithIcon();
     }
@@ -203,8 +209,7 @@ const CategoriesListResults = ({ customers, ...rest }) => {
             name: category.name,
             icon: category.icon,
             is_active: !category.is_active,
-            type: category.type || 'income',
-            sub_cats: category.sub_cats || []
+            type: category.type || 'income'
           }
         });
       } catch (err) {
