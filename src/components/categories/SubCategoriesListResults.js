@@ -1,7 +1,6 @@
 /* eslint-disable */
 
 import { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { useParams } from 'react-router-dom';
 import {
@@ -33,12 +32,10 @@ import {
   deleteSubCategory as DELETE_SUB_CATEGORY
 } from 'src/GraphQL/Mutations';
 import { useMutation } from '@apollo/client';
-import axios from 'axios';
-import {
-  CloudinaryUploadUrl,
-  CloudinaryUploadPreset
-} from 'src/components/config/config';
 import { ToastContainer, toast } from 'react-toastify';
+// import ColorPicker from 'material-ui-color-picker';
+import { MaterialPicker } from 'react-color';
+import { ChromePicker } from 'react-color';
 
 const useStyles = makeStyles((theme) => ({
   title: {
@@ -63,15 +60,16 @@ const SubCategoriesListResults = ({ customers, refetchQuery, ...rest }) => {
   const [selectedCustomerIds, setSelectedCustomerIds] = useState([]);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
+  const [showColor, setShowColor] = useState();
   const [startPoint, setStartPoint] = useState(0);
   const [endPoint, setEndPoint] = useState(0);
   const params = useParams();
-
   const [editCat, setEditCat] = useState({
     id: null,
     name: null,
     icon: null,
-    type: null
+    type: null,
+    color: null
   });
   const [updateIcon, setUpdateIcon] = useState(false);
   const [editSubCategory, { data, loading, error }] =
@@ -149,8 +147,8 @@ const SubCategoriesListResults = ({ customers, refetchQuery, ...rest }) => {
   };
 
   const handleEdit = (customer) => {
-    const { _id: id, name, icon, type } = customer;
-    setEditCat({ id, name, icon, type });
+    const { _id: id, name, icon, type, color } = customer;
+    setEditCat({ id, name, icon, type, color });
     setModalOpen(true);
   };
 
@@ -171,6 +169,7 @@ const SubCategoriesListResults = ({ customers, refetchQuery, ...rest }) => {
               name: editCat.name,
               icon: editCat.icon,
               type: editCat.type,
+              color: editCat.color || '#000000',
               parent_cat_id: params.id
             }
           });
@@ -194,6 +193,7 @@ const SubCategoriesListResults = ({ customers, refetchQuery, ...rest }) => {
               name: editCat.name,
               icon: uploadLink,
               type: editCat.type,
+              color: editCat.color || '#000000',
               parent_cat_id: params.id
             }
           });
@@ -255,6 +255,7 @@ const SubCategoriesListResults = ({ customers, refetchQuery, ...rest }) => {
                 </TableCell>
                 <TableCell>Name</TableCell>
                 <TableCell>Type</TableCell>
+                <TableCell>Color</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell style={{ textAlign: 'right' }}>Edit</TableCell>
                 <TableCell>Action</TableCell>
@@ -307,6 +308,22 @@ const SubCategoriesListResults = ({ customers, refetchQuery, ...rest }) => {
                       >
                         {customer.type ? customer.type : 'No Type'}
                       </Typography>
+                    </Box>
+                  </TableCell>
+                  <TableCell>
+                    <Box
+                      sx={{
+                        alignItems: 'center',
+                        display: 'flex'
+                      }}
+                    >
+                      <div
+                        style={{
+                          backgroundColor: customer.color || '#000000',
+                          width: '100%',
+                          height: '50px'
+                        }}
+                      ></div>
                     </Box>
                   </TableCell>
                   <TableCell>
@@ -393,12 +410,29 @@ const SubCategoriesListResults = ({ customers, refetchQuery, ...rest }) => {
                       label="Category Name"
                     />
                   </Grid>
-                  <Grid item md={12}>
+                  <Grid item md={6}>
                     <SelectComponent
                       inputLabel="Type"
                       handleOnSelect={handleSelectType}
                       value={editCat.type}
                     />
+                  </Grid>
+                  <Grid item md={6}>
+                    <input
+                      type="color"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        border: '2px solid #00000038',
+                        background: '#00000012',
+                        borderRadius: '4px',
+                        overflow: 'hidden'
+                      }}
+                      defaultValue={editCat.color || '#000000'}
+                      onChange={(event) =>
+                        setEditCat({ ...editCat, color: event.target.value })
+                      }
+                    ></input>
                   </Grid>
                   <Grid item md={12}>
                     <Button

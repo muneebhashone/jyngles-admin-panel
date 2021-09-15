@@ -26,11 +26,13 @@ export const getCategory = gql`
       icon
       type
       is_active
+      color
       subCats {
         _id
         name
         type
         icon
+        color
       }
     }
   }
@@ -44,12 +46,14 @@ export const getAllCategories = gql`
       icon
       is_active
       type
+      color
       subCats {
         _id
         name
         icon
         type
         is_active
+        color
       }
     }
   }

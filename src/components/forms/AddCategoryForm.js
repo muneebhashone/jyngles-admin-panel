@@ -25,6 +25,7 @@ function AddCategoryForm({ refetchQuery, onSuccess }) {
   const [icon, setIcon] = useState('');
   const [categoryName, setCategoryName] = useState('');
   const [categoryType, setCategoryType] = useState('');
+  const [color, setColor] = useState('#000000');
   const [createCategory, { data, loading, error }] =
     useMutation(CREATE_CATEGORY);
 
@@ -59,6 +60,7 @@ function AddCategoryForm({ refetchQuery, onSuccess }) {
           name: categoryName,
           icon: iconUrl,
           type: categoryType,
+          color: color,
           sub_cats: []
         }
       });
@@ -124,12 +126,27 @@ function AddCategoryForm({ refetchQuery, onSuccess }) {
               label="Category Name"
             />
           </Grid>
-          <Grid item md={12}>
+          <Grid item md={6}>
             <SelectComponent
               inputLabel="Type"
               handleOnSelect={(value) => setCategoryType(value)}
               value={categoryType}
             />
+          </Grid>
+          <Grid item md={6}>
+            <input
+              type="color"
+              style={{
+                width: '100%',
+                height: '100%',
+                border: '2px solid #00000038',
+                background: '#00000012',
+                borderRadius: '4px',
+                overflow: 'hidden'
+              }}
+              defaultValue={color}
+              onChange={(event) => setColor(event.target.value)}
+            ></input>
           </Grid>
           <Grid item md={12}>
             <Button

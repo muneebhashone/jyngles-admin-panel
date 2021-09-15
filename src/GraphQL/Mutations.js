@@ -6,6 +6,7 @@ export const createCategory = gql`
     $name: String!
     $icon: String
     $type: String
+    $color: String!
     $sub_cats: [String]!
   ) {
     createCategory(
@@ -13,6 +14,7 @@ export const createCategory = gql`
         name: $name
         icon: $icon
         type: $type
+        color: $color
         sub_cats: $sub_cats
       }
     ) {
@@ -35,6 +37,7 @@ export const editCategory = gql`
     $icon: String!
     $is_active: Boolean
     $type: String
+    $color: String!
   ) {
     editCategory(
       editCategoryInput: {
@@ -43,6 +46,7 @@ export const editCategory = gql`
         icon: $icon
         is_active: $is_active
         type: $type
+        color: $color
       }
     ) {
       _id
@@ -50,6 +54,7 @@ export const editCategory = gql`
       icon
       is_active
       type
+      color
     }
   }
 `;
@@ -149,6 +154,7 @@ export const createSubCategory = gql`
     $icon: String
     $type: String
     $parent_cat_id: String!
+    $color: String!
   ) {
     createSubCategory(
       subCategoryInput: {
@@ -156,6 +162,7 @@ export const createSubCategory = gql`
         icon: $icon
         type: $type
         parent_cat_id: $parent_cat_id
+        color: $color
       }
     ) {
       _id
@@ -177,6 +184,7 @@ export const editSubCategory = gql`
     $icon: String
     $type: String
     $parent_cat_id: String!
+    $color: String!
   ) {
     editSubCategory(
       editSubCategoryInput: {
@@ -185,6 +193,7 @@ export const editSubCategory = gql`
         icon: $icon
         type: $type
         parent_cat_id: $parent_cat_id
+        color: $color
       }
     ) {
       _id
@@ -194,6 +203,7 @@ export const editSubCategory = gql`
       subCats {
         _id
         name
+        color
       }
     }
   }

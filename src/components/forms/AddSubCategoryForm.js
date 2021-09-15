@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Grid, Button, TextField } from '@material-ui/core';
+import { useParams } from 'react-router';
 import {
   getCategory as GET_CATEGORY,
   getAllCategories as GET_ALL_CATEGORIES
@@ -31,6 +32,7 @@ function AddSubCategoryForm({ refetchQuery, onSuccess }) {
   const [categoryParent, setCategoryParent] = useState('');
   const [categoryType, setCategoryType] = useState('');
   const [selectMenuItems, setSelectMenuItems] = useState([]);
+  const [color, setColor] = useState('#000000');
   const [createSubCategory, { data, loading, error }] =
     useMutation(CREATE_SUB_CATEGORY);
   const {
@@ -38,6 +40,13 @@ function AddSubCategoryForm({ refetchQuery, onSuccess }) {
     loading: parentCategoryLoading,
     error: parentCategoryError
   } = useQuery(GET_CATEGORY, { pollInterval: 500 });
+  const params = useParams();
+
+  useEffect(() => {
+    if (params.id) {
+      setCategoryParent(params.id);
+    }
+  }, []);
 
   useEffect(() => {
     console.log(parentCategoryData);
@@ -91,6 +100,7 @@ function AddSubCategoryForm({ refetchQuery, onSuccess }) {
           name: categoryName,
           icon: iconUrl,
           type: categoryType,
+          color: color,
           parent_cat_id: categoryParent
         }
       });
@@ -162,12 +172,27 @@ function AddSubCategoryForm({ refetchQuery, onSuccess }) {
               label="Category Name"
             />
           </Grid>
-          <Grid item md={12}>
+          <Grid item md={6}>
             <SelectComponent
               inputLabel="Type"
               handleOnSelect={(value) => setCategoryType(value)}
               value={categoryType}
             />
+          </Grid>
+          <Grid item md={6}>
+            <input
+              type="color"
+              style={{
+                width: '100%',
+                height: '100%',
+                border: '2px solid #00000038',
+                background: '#00000012',
+                borderRadius: '4px',
+                overflow: 'hidden'
+              }}
+              defaultValue={color}
+              onChange={(event) => setColor(event.target.value)}
+            ></input>
           </Grid>
           <Grid item md={12}>
             <SelectComponent

@@ -30,11 +30,6 @@ import uploadToCloudinary from 'src/utils/uploadToCloudinary';
 // import Alert from 'src/components/alert/Alert';
 import { editCategory as EDIT_CATEGORY } from 'src/GraphQL/Mutations';
 import { useMutation } from '@apollo/client';
-import axios from 'axios';
-import {
-  CloudinaryUploadUrl,
-  CloudinaryUploadPreset
-} from 'src/components/config/config';
 import { ToastContainer, toast } from 'react-toastify';
 
 const useStyles = makeStyles((theme) => ({
@@ -66,7 +61,8 @@ const CategoriesListResults = ({ customers, ...rest }) => {
     id: null,
     name: null,
     icon: null,
-    type: null
+    type: null,
+    color: null
   });
   const [updateIcon, setUpdateIcon] = useState(false);
   const [editCategory, { data, loading, error }] = useMutation(EDIT_CATEGORY);
@@ -140,8 +136,8 @@ const CategoriesListResults = ({ customers, ...rest }) => {
   };
 
   const handleEdit = (customer) => {
-    const { _id: id, name, icon, type } = customer;
-    setEditCat({ id, name, icon, type });
+    const { _id: id, name, icon, type, color } = customer;
+    setEditCat({ id, name, icon, type, color });
     setModalOpen(true);
   };
 
@@ -162,6 +158,7 @@ const CategoriesListResults = ({ customers, ...rest }) => {
               name: editCat.name,
               icon: editCat.icon,
               is_active: true,
+              color: editCat.color || '#000000',
               type: editCat.type
             }
           });
@@ -184,6 +181,7 @@ const CategoriesListResults = ({ customers, ...rest }) => {
               name: editCat.name,
               icon: uploadLink,
               is_active: true,
+              color: editCat.color || '#000000',
               type: editCat.type
             }
           });
@@ -209,6 +207,7 @@ const CategoriesListResults = ({ customers, ...rest }) => {
             name: category.name,
             icon: category.icon,
             is_active: !category.is_active,
+            color: editCat.color || '#000000',
             type: category.type || 'income'
           }
         });
@@ -247,6 +246,7 @@ const CategoriesListResults = ({ customers, ...rest }) => {
                 </TableCell>
                 <TableCell>Name</TableCell>
                 <TableCell>Type</TableCell>
+                <TableCell>Color</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell style={{ textAlign: 'right' }}>Edit</TableCell>
                 <TableCell>Action</TableCell>
@@ -301,6 +301,22 @@ const CategoriesListResults = ({ customers, ...rest }) => {
                       >
                         {customer.type ? customer.type : 'No Type'}
                       </Typography>
+                    </Box>
+                  </TableCell>
+                  <TableCell>
+                    <Box
+                      sx={{
+                        alignItems: 'center',
+                        display: 'flex'
+                      }}
+                    >
+                      <div
+                        style={{
+                          backgroundColor: customer.color || '#000000',
+                          width: '100%',
+                          height: '50px'
+                        }}
+                      ></div>
                     </Box>
                   </TableCell>
                   <TableCell>
@@ -387,12 +403,29 @@ const CategoriesListResults = ({ customers, ...rest }) => {
                       label="Category Name"
                     />
                   </Grid>
-                  <Grid item md={12}>
+                  <Grid item md={6}>
                     <SelectComponent
                       inputLabel="Type"
                       handleOnSelect={handleSelectType}
                       value={editCat.type}
                     />
+                  </Grid>
+                  <Grid item md={6}>
+                    <input
+                      type="color"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        border: '2px solid #00000038',
+                        background: '#00000012',
+                        borderRadius: '4px',
+                        overflow: 'hidden'
+                      }}
+                      defaultValue={editCat.color || '#000000'}
+                      onChange={(event) =>
+                        setEditCat({ ...editCat, color: event.target.value })
+                      }
+                    ></input>
                   </Grid>
                   <Grid item md={12}>
                     <Button
