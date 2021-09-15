@@ -207,7 +207,7 @@ const CategoriesListResults = ({ customers, ...rest }) => {
             name: category.name,
             icon: category.icon,
             is_active: !category.is_active,
-            color: editCat.color || '#000000',
+            color: category.color,
             type: category.type || 'income'
           }
         });
