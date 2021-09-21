@@ -2,15 +2,15 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
-import CustomerListResults from 'src/components/customer/CustomerListResults';
-import CustomerListToolbar from 'src/components/customer/CustomerListToolbar';
+import BugListResults from 'src/components/bug/BugListResults';
+import BugListToolbar from 'src/components/bug/BugListToolbar';
 import LoadingSpinner from 'src/components/ui/loading-spinner';
 import { useQuery } from '@apollo/client';
-import { getAllUsers } from 'src/GraphQL/Queries';
+import { getBugs } from 'src/GraphQL/Queries';
 import string from 'string-sanitizer';
 
-const CustomerList = () => {
-  const { data, loading, error, refetch } = useQuery(getAllUsers);
+const BugList = () => {
+  const { data, loading, error, refetch } = useQuery(getBugs);
   const [newData, setNewData] = useState(null);
   const [search, setSearch] = useState('');
 
@@ -20,21 +20,19 @@ const CustomerList = () => {
 
   useEffect(() => {
     if (!loading) {
-      setNewData(data.getAllUsers.map((dataItem) => dataItem));
+      setNewData(data.bugs.map((dataItem) => dataItem));
     }
 
     if (!loading && search) {
       if (search !== '') {
         const regex = new RegExp(string.sanitize.keepSpace(search), 'gi');
         setNewData((selectData) =>
-          selectData.filter(
-            (user) => user.name.match(regex) || user.email.includes(search)
-          )
+          selectData.filter((bug) => bug.title.match(regex))
         );
       }
 
       if (search === '') {
-        setNewData(data.getAllUsers.map((dataItem) => dataItem));
+        setNewData(data.bugs.map((dataItem) => dataItem));
       }
     }
   }, [data, search]);
@@ -42,7 +40,7 @@ const CustomerList = () => {
   return (
     <>
       <Helmet>
-        <title>Users | Jyngles</title>
+        <title>Bugs | Jyngles</title>
       </Helmet>
       <Box
         sx={{
@@ -52,12 +50,12 @@ const CustomerList = () => {
         }}
       >
         <Container maxWidth={false}>
-          <CustomerListToolbar handleCategorySearch={handleSearch} />
+          <BugListToolbar handleCategorySearch={handleSearch} />
           <Box sx={{ pt: 3 }}>
             {newData === null ? (
               <LoadingSpinner />
             ) : (
-              <CustomerListResults customers={newData} refetch={refetch} />
+              <BugListResults customers={newData} refetch={refetch} />
             )}
           </Box>
         </Container>
@@ -66,4 +64,4 @@ const CustomerList = () => {
   );
 };
 
-export default CustomerList;
+export default BugList;

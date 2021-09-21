@@ -134,12 +134,7 @@ function AddSubCategoryForm({ refetchQuery, onSuccess }) {
       });
 
       if (responseCreate.data.createSubCategory.name) {
-        formik.setFieldValue('subCategoryNameEn', '');
-        formik.setFieldValue('color', '#000000');
-        // formik.resetForm({
-        //   subCategoryNameEn: '',
-        //   color: '#000000'
-        // });
+        formik.resetForm();
         onSuccess();
         refetchQuery();
       }

@@ -21,9 +21,8 @@ import { useMutation } from '@apollo/client';
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import limitWord from 'src/utils/limitSentence';
-// import getInitials from 'src/utils/getInitials';
 
-const CustomerListResults = ({ customers, refetch, ...rest }) => {
+const BugListResults = ({ customers, refetch, ...rest }) => {
   const [selectedCustomerIds, setSelectedCustomerIds] = useState([]);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
@@ -147,12 +146,11 @@ const CustomerListResults = ({ customers, refetch, ...rest }) => {
                     onChange={handleSelectAll}
                   />
                 </TableCell>
-                <TableCell>Name</TableCell>
+                <TableCell>Title</TableCell>
+                <TableCell>Description</TableCell>
+                <TableCell>Reported By</TableCell>
                 <TableCell>Email</TableCell>
                 <TableCell>Phone</TableCell>
-                <TableCell>Registration Date</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell style={{ textAlign: 'center' }}>Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -177,42 +175,17 @@ const CustomerListResults = ({ customers, refetch, ...rest }) => {
                         display: 'flex'
                       }}
                     >
-                      {/* <Avatar src={customer.avatarUrl} sx={{ mr: 2 }}>
-                        {getInitials(customer.name)}
-                      </Avatar> */}
                       <Typography color="textPrimary" variant="body1">
-                        {customer.name
-                          ? limitWord(customer.name, 35)
-                          : 'No Name'}
+                        {customer.title}
                       </Typography>
                     </Box>
                   </TableCell>
+                  <TableCell>{customer.description}</TableCell>
                   <TableCell>
-                    {customer.email ? customer.email : 'No Email'}
+                    {`${customer?.user?.name} ${customer?.user?.last_name}`}
                   </TableCell>
-                  <TableCell>
-                    {customer.phone
-                      ? limitWord(customer.phone, 25)
-                      : 'No Phone Number'}
-                  </TableCell>
-                  <TableCell>
-                    {moment(new Date(+customer.createdAt)).format('DD/MM/YYYY')}
-                  </TableCell>
-                  <TableCell>
-                    {customer.is_active ? 'Active' : 'Disabled'}
-                  </TableCell>
-                  <TableCell style={{ textAlign: 'center' }}>
-                    <Button
-                      onClick={() =>
-                        confirmDisableOrEnable(
-                          customer.email,
-                          customer.is_active
-                        )
-                      }
-                    >
-                      {customer.is_active ? 'DISABLE' : 'ENABLE'}
-                    </Button>
-                  </TableCell>
+                  <TableCell>{customer.user?.email}</TableCell>
+                  <TableCell>{customer.user?.phone}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -232,4 +205,4 @@ const CustomerListResults = ({ customers, refetch, ...rest }) => {
   );
 };
 
-export default CustomerListResults;
+export default BugListResults;

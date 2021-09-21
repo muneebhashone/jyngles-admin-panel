@@ -18,6 +18,23 @@ export const myGoals = gql`
   }
 `;
 
+export const getBugs = gql`
+  query {
+    bugs {
+      _id
+      title
+      description
+      user {
+        _id
+        name
+        last_name
+        email
+        phone
+      }
+    }
+  }
+`;
+
 export const getCategory = gql`
   query ($type: String) {
     categories(type: $type) {
