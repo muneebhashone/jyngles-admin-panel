@@ -1,19 +1,18 @@
 /* eslint-disable */
-
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
-import CategoriesListResults from 'src/components/categories/CategoriesListResults';
-import CategoriesListToolbar from 'src/components/categories/CategoriesListToolbar';
-import { useQuery } from '@apollo/client';
-import { getAllCategories } from 'src/GraphQL/Queries';
+import CustomerListResults from 'src/components/customer/CustomerListResults';
+import CustomerListToolbar from 'src/components/customer/CustomerListToolbar';
 import LoadingSpinner from 'src/components/ui/loading-spinner';
+import { useQuery } from '@apollo/client';
+import { getAllUsers } from 'src/GraphQL/Queries';
 import string from 'string-sanitizer';
 
-const CategoriesList = () => {
-  const { data, loading, refetch } = useQuery(getAllCategories);
+const CustomerList = () => {
+  const { data, loading, error, refetch } = useQuery(getAllUsers);
   const [newData, setNewData] = useState(null);
-  const [search, setSearch] = useState();
+  const [search, setSearch] = useState('');
 
   const handleSearch = (value) => {
     setSearch(value);
@@ -21,19 +20,21 @@ const CategoriesList = () => {
 
   useEffect(() => {
     if (!loading) {
-      setNewData(data.getAllCategories.map((dataItem) => dataItem).reverse());
+      setNewData(data.getAllUsers.map((dataItem) => dataItem));
     }
 
     if (!loading && search) {
       if (search !== '') {
         const regex = new RegExp(string.sanitize.keepSpace(search), 'gi');
         setNewData((selectData) =>
-          selectData.filter((category) => category.name.match(regex))
+          selectData.filter(
+            (user) => user.name.match(regex) || user.email.includes(search)
+          )
         );
       }
 
       if (search === '') {
-        setNewData(data.getAllCategories.map((dataItem) => dataItem).reverse());
+        setNewData(data.getAllUsers.map((dataItem) => dataItem));
       }
     }
   }, [data, search]);
@@ -41,7 +42,7 @@ const CategoriesList = () => {
   return (
     <>
       <Helmet>
-        <title>Categories | Jyngles</title>
+        <title>Users | Jyngles</title>
       </Helmet>
       <Box
         sx={{
@@ -51,18 +52,12 @@ const CategoriesList = () => {
         }}
       >
         <Container maxWidth={false}>
-          <CategoriesListToolbar
-            refetch={refetch}
-            handleCategorySearch={handleSearch}
-          />
+          <CustomerListToolbar handleCategorySearch={handleSearch} />
           <Box sx={{ pt: 3 }}>
             {newData === null ? (
               <LoadingSpinner />
             ) : (
-              <CategoriesListResults
-                refetchQuery={refetch}
-                customers={newData}
-              />
+              <CustomerListResults customers={newData} refetch={refetch} />
             )}
           </Box>
         </Container>
@@ -71,4 +66,4 @@ const CategoriesList = () => {
   );
 };
 
-export default CategoriesList;
+export default CustomerList;

@@ -8,6 +8,20 @@ export const createCategory = gql`
     $type: String
     $color: String!
     $sub_cats: [String]!
+    $ar: String
+    $bn: String
+    $de: String
+    $en: String
+    $es: String
+    $ff: String
+    $fr: String
+    $hi: String
+    $idd: String
+    $it: String
+    $pp: String
+    $ru: String
+    $ur: String
+    $md: String
   ) {
     createCategory(
       categoryInput: {
@@ -16,6 +30,20 @@ export const createCategory = gql`
         type: $type
         color: $color
         sub_cats: $sub_cats
+        ar: $ar
+        bn: $bn
+        de: $de
+        en: $en
+        es: $es
+        ff: $ff
+        fr: $fr
+        hi: $hi
+        idd: $idd
+        it: $it
+        pp: $pp
+        ru: $ru
+        ur: $ur
+        md: $md
       }
     ) {
       name
@@ -38,6 +66,20 @@ export const editCategory = gql`
     $is_active: Boolean
     $type: String
     $color: String!
+    $ar: String
+    $bn: String
+    $de: String
+    $en: String
+    $es: String
+    $ff: String
+    $fr: String
+    $hi: String
+    $idd: String
+    $it: String
+    $pp: String
+    $ru: String
+    $ur: String
+    $md: String
   ) {
     editCategory(
       editCategoryInput: {
@@ -47,6 +89,20 @@ export const editCategory = gql`
         is_active: $is_active
         type: $type
         color: $color
+        ar: $ar
+        bn: $bn
+        de: $de
+        en: $en
+        es: $es
+        ff: $ff
+        fr: $fr
+        hi: $hi
+        idd: $idd
+        it: $it
+        pp: $pp
+        ru: $ru
+        ur: $ur
+        md: $md
       }
     ) {
       _id
@@ -155,6 +211,20 @@ export const createSubCategory = gql`
     $type: String
     $parent_cat_id: String!
     $color: String!
+    $ar: String
+    $bn: String
+    $de: String
+    $en: String
+    $es: String
+    $ff: String
+    $fr: String
+    $hi: String
+    $idd: String
+    $it: String
+    $pp: String
+    $ru: String
+    $ur: String
+    $md: String
   ) {
     createSubCategory(
       subCategoryInput: {
@@ -163,6 +233,20 @@ export const createSubCategory = gql`
         type: $type
         parent_cat_id: $parent_cat_id
         color: $color
+        ar: $ar
+        bn: $bn
+        de: $de
+        en: $en
+        es: $es
+        ff: $ff
+        fr: $fr
+        hi: $hi
+        idd: $idd
+        it: $it
+        pp: $pp
+        ru: $ru
+        ur: $ur
+        md: $md
       }
     ) {
       _id
@@ -177,6 +261,38 @@ export const createSubCategory = gql`
   }
 `;
 
+// export const editSubCategory = gql`
+//   mutation editSubCategory(
+//     $id: String!
+//     $name: String!
+//     $icon: String
+//     $type: String
+//     $parent_cat_id: String!
+//     $color: String!
+//   ) {
+//     editSubCategory(
+//       editSubCategoryInput: {
+//         id: $id
+//         name: $name
+//         icon: $icon
+//         type: $type
+//         parent_cat_id: $parent_cat_id
+//         color: $color
+//       }
+//     ) {
+//       _id
+//       name
+//       icon
+//       is_active
+//       subCats {
+//         _id
+//         name
+//         color
+//       }
+//     }
+//   }
+// `;
+
 export const editSubCategory = gql`
   mutation editSubCategory(
     $id: String!
@@ -184,10 +300,38 @@ export const editSubCategory = gql`
     $icon: String
     $type: String
     $parent_cat_id: String!
-    $color: String!
+    $ar: String
+    $bn: String
+    $de: String
+    $en: String
+    $es: String
+    $ff: String
+    $fr: String
+    $hi: String
+    $idd: String
+    $it: String
+    $pp: String
+    $ru: String
+    $ur: String
+    $md: String
+    $color: String
   ) {
     editSubCategory(
       editSubCategoryInput: {
+        ar: $ar
+        bn: $bn
+        de: $de
+        en: $en
+        es: $es
+        ff: $ff
+        fr: $fr
+        hi: $hi
+        idd: $idd
+        it: $it
+        pp: $pp
+        ru: $ru
+        ur: $ur
+        md: $md
         id: $id
         name: $name
         icon: $icon
@@ -203,6 +347,9 @@ export const editSubCategory = gql`
       subCats {
         _id
         name
+        icon
+        is_active
+        type
         color
       }
     }

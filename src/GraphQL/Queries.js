@@ -27,12 +27,40 @@ export const getCategory = gql`
       type
       is_active
       color
+      ar
+      bn
+      de
+      en
+      es
+      ff
+      fr
+      hi
+      it
+      pp
+      ru
+      ur
+      md
+      idd
       subCats {
         _id
         name
         type
         icon
         color
+        ar
+        bn
+        de
+        en
+        es
+        ff
+        fr
+        hi
+        it
+        pp
+        ru
+        ur
+        md
+        idd
       }
     }
   }
@@ -47,6 +75,20 @@ export const getAllCategories = gql`
       is_active
       type
       color
+      ar
+      bn
+      de
+      en
+      es
+      ff
+      fr
+      hi
+      it
+      pp
+      ru
+      ur
+      md
+      idd
       subCats {
         _id
         name
@@ -54,6 +96,20 @@ export const getAllCategories = gql`
         type
         is_active
         color
+        ar
+        bn
+        de
+        en
+        es
+        ff
+        fr
+        hi
+        it
+        pp
+        ru
+        ur
+        md
+        idd
       }
     }
   }

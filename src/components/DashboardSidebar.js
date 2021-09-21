@@ -10,31 +10,14 @@ import {
   Typography,
   Button
 } from '@material-ui/core';
-// import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import {
   AlertCircle as AlertCircleIcon,
-  // BarChart as BarChartIcon,
-  // Lock as LockIcon,
-  // Settings as SettingsIcon,
   ShoppingBag as ShoppingBagIcon,
-  // User as UserIcon,
-  // UserPlus as UserPlusIcon,
   Users as UsersIcon
 } from 'react-feather';
 import NavItem from './NavItem';
 
-// const user = {
-//   avatar: '/static/images/avatars/avatar_6.png',
-//   jobTitle: 'Admin',
-//   name: 'John Doe'
-// };
-
 const items = [
-  // {
-  //   href: '/app/dashboard',
-  //   icon: BarChartIcon,
-  //   title: 'Dashboard'
-  // },
   {
     href: '/admin/customers',
     icon: UsersIcon,
@@ -44,37 +27,12 @@ const items = [
     href: '/admin/categories',
     icon: ShoppingBagIcon,
     title: 'Categories'
+  },
+  {
+    href: '/admin/bugs',
+    icon: AlertCircleIcon,
+    title: 'Bugs'
   }
-  // {
-  //   href: '/app/products',
-  //   icon: ShoppingBagIcon,
-  //   title: 'Products'
-  // },
-  // {
-  //   href: '/app/account',
-  //   icon: UserIcon,
-  //   title: 'Account'
-  // },
-  // {
-  //   href: '/app/settings',
-  //   icon: SettingsIcon,
-  //   title: 'Settings'
-  // },
-  // {
-  //   href: '/logout',
-  //   icon: LockIcon,
-  //   title: 'Logout'
-  // }
-  // {
-  //   href: '/register',
-  //   icon: UserPlusIcon,
-  //   title: 'Register'
-  // },
-  // {
-  //   href: '/admin/404',
-  //   icon: AlertCircleIcon,
-  //   title: 'Error'
-  // }
 ];
 
 const DashboardSidebar = ({ onMobileClose, openMobile }) => {
@@ -110,23 +68,9 @@ const DashboardSidebar = ({ onMobileClose, openMobile }) => {
           p: 2
         }}
       >
-        {/* <Avatar
-          component={RouterLink}
-          sx={{
-            cursor: 'pointer',
-            width: 64,
-            height: 64
-          }}
-          to="/app/account"
-        >
-          <AccountCircleIcon />
-        </Avatar> */}
         <Typography color="textPrimary" variant="h5">
           Admin
         </Typography>
-        {/* <Typography color="textSecondary" variant="body2">
-          {user.jobTitle}
-        </Typography> */}
       </Box>
       <Divider />
       <Box sx={{ p: 2 }}>

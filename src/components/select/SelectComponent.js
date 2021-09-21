@@ -17,9 +17,8 @@ const detaultMenuItems = [
 
 const SelectComponent = ({
   inputLabel,
-  value,
-  handleOnSelect,
-  menuItems = detaultMenuItems
+  menuItems = detaultMenuItems,
+  ...restProps
 }) => {
   const [open, setOpen] = React.useState(false);
 
@@ -42,8 +41,7 @@ const SelectComponent = ({
         open={open}
         onClose={handleClose}
         onOpen={handleOpen}
-        value={value}
-        onChange={(event) => handleOnSelect(event.target.value)}
+        {...restProps}
         fullWidth
       >
         {menuItems.map((item) => (

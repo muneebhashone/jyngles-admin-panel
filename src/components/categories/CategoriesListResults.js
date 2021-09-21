@@ -27,10 +27,11 @@ import SelectComponent from '../select/SelectComponent';
 import EditIcon from '@material-ui/icons/Edit';
 import getInitials from 'src/utils/getInitials';
 import uploadToCloudinary from 'src/utils/uploadToCloudinary';
-// import Alert from 'src/components/alert/Alert';
 import { editCategory as EDIT_CATEGORY } from 'src/GraphQL/Mutations';
 import { useMutation } from '@apollo/client';
 import { ToastContainer, toast } from 'react-toastify';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 
 const useStyles = makeStyles((theme) => ({
   title: {
@@ -38,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
   },
   paper: {
     position: 'absolute',
-    width: '30%',
+    width: '80%',
     backgroundColor: theme.palette.background.paper,
     boxShadow: theme.shadows[1],
     padding: theme.spacing(3, 4, 3),
@@ -51,20 +52,54 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const CategoriesListResults = ({ customers, ...rest }) => {
+const EditCategorySchema = Yup.object().shape({
+  icon: Yup.string().required('Icon is required'),
+  categoryNameEn: Yup.string().required('Category Name (English) is required'),
+  categoryType: Yup.string().required('Please choose Category type'),
+  color: Yup.string().required('Category color is required')
+});
+
+const CategoriesListResults = ({ customers, refetchQuery, ...rest }) => {
   const [selectedCustomerIds, setSelectedCustomerIds] = useState([]);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
   const [startPoint, setStartPoint] = useState(0);
   const [endPoint, setEndPoint] = useState(0);
-  const [editCat, setEditCat] = useState({
-    id: null,
-    name: null,
-    icon: null,
-    type: null,
-    color: null
-  });
   const [updateIcon, setUpdateIcon] = useState(false);
+
+  const formik = useFormik({
+    initialValues: {
+      id: '',
+      icon: '',
+      categoryNameEn: '',
+      categoryNameAr: '',
+      categoryNameBn: '',
+      categoryNameDe: '',
+      categoryNameEs: '',
+      categoryNameFf: '',
+      categoryNameFr: '',
+      categoryNameHi: '',
+      categoryNameIdd: '',
+      categoryNameIt: '',
+      categoryNamePp: '',
+      categoryNameRu: '',
+      categoryNameUr: '',
+      categoryNameMd: '',
+      categoryType: '',
+      color: '#000000'
+    },
+    validationSchema: EditCategorySchema,
+    onSubmit: (values) => {
+      handleEditSubmit(values);
+    }
+  });
+
+  const handleIconChange = (files) => {
+    if (!files) return;
+    formik.setFieldValue('icon', files[0]);
+    setUpdateIcon(true);
+  };
+
   const [editCategory, { data, loading, error }] = useMutation(EDIT_CATEGORY);
   const classes = useStyles();
   const [modalOpen, setModalOpen] = useState(false);
@@ -136,86 +171,100 @@ const CategoriesListResults = ({ customers, ...rest }) => {
   };
 
   const handleEdit = (customer) => {
-    const { _id: id, name, icon, type, color } = customer;
-    setEditCat({ id, name, icon, type, color });
+    console.log(customer);
+
+    formik.setFieldValue('id', customer._id);
+    formik.setFieldValue('categoryNameEn', customer.name);
+    formik.setFieldValue('icon', customer.icon);
+    formik.setFieldValue('categoryType', customer.type);
+    formik.setFieldValue('color', customer.color);
+    formik.setFieldValue('categoryNameAr', customer.ar);
+    formik.setFieldValue('categoryNameBn', customer.bn);
+    formik.setFieldValue('categoryNameDe', customer.de);
+    formik.setFieldValue('categoryNameEs', customer.es);
+    formik.setFieldValue('categoryNameFf', customer.ff);
+    formik.setFieldValue('categoryNameFr', customer.fr);
+    formik.setFieldValue('categoryNameHi', customer.hi);
+    formik.setFieldValue('categoryNameIt', customer.it);
+    formik.setFieldValue('categoryNameMd', customer.md);
+    formik.setFieldValue('categoryNameIdd', customer.idd);
+    formik.setFieldValue('categoryNamePp', customer.pp);
+    formik.setFieldValue('categoryNameRu', customer.ru);
+    formik.setFieldValue('categoryNameUr', customer.ur);
+
     setModalOpen(true);
   };
 
-  const handleEditSubmit = (event) => {
-    event.preventDefault();
+  const handleEditSubmit = async (values) => {
+    try {
+      let categoryIcon = values.icon;
 
-    if (editCat.name === '' || editCat.name === null) {
-      alert('Category name should not be empty');
-      return;
-    }
-
-    if (!updateIcon) {
-      const updateCategoryWithoutIcon = async () => {
-        try {
-          const response = await editCategory({
-            variables: {
-              id: String(editCat.id),
-              name: editCat.name,
-              icon: editCat.icon,
-              is_active: true,
-              color: editCat.color || '#000000',
-              type: editCat.type
-            }
-          });
-          notify();
-        } catch (err) {
-          console.log(err);
-        }
-      };
-      updateCategoryWithoutIcon();
-    }
-
-    if (updateIcon) {
-      const updateCategoryWithIcon = async () => {
-        try {
-          const uploadLink = await uploadToCloudinary(editCat.icon);
-
-          const resp = await editCategory({
-            variables: {
-              id: String(editCat.id),
-              name: editCat.name,
-              icon: uploadLink,
-              is_active: true,
-              color: editCat.color || '#000000',
-              type: editCat.type
-            }
-          });
-          notify();
-        } catch (err) {
-          console.log(err);
-        }
-      };
-      updateCategoryWithIcon();
-    }
-  };
-
-  const handleSelectType = (value) => {
-    setEditCat({ ...editCat, type: value });
-  };
-
-  const handleCategoryStatus = (category) => {
-    const updateCategoryStatus = async () => {
-      try {
-        const response = await editCategory({
-          variables: {
-            id: category._id,
-            name: category.name,
-            icon: category.icon,
-            is_active: !category.is_active,
-            color: category.color,
-            type: category.type || 'income'
-          }
-        });
-      } catch (err) {
-        console.log(err);
+      if (updateIcon) {
+        categoryIcon = await uploadToCloudinary(values.icon);
       }
-    };
-    updateCategoryStatus();
+
+      const resp = await editCategory({
+        variables: {
+          id: values.id,
+          name: values.categoryNameEn,
+          ar: values.categoryNameAr,
+          en: values.categoryNameEn,
+          bn: values.categoryNameBn,
+          de: values.categoryNameDe,
+          es: values.categoryNameEs,
+          ff: values.categoryNameFf,
+          fr: values.categoryNameFr,
+          hi: values.categoryNameHi,
+          idd: values.categoryNameIdd,
+          it: values.categoryNameIt,
+          pp: values.categoryNamePp,
+          ru: values.categoryNameRu,
+          ur: values.categoryNameUr,
+          md: values.categoryNameMd,
+          icon: categoryIcon,
+          type: values.categoryType,
+          color: values.color
+        }
+      });
+
+      if (resp.data.editCategory.name) {
+        notify();
+        refetchQuery();
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleCategoryStatus = async (category) => {
+    try {
+      await editCategory({
+        variables: {
+          id: category._id,
+          name: category.name,
+          icon: category.icon,
+          is_active: !category.is_active,
+          color: category.color,
+          type: category.type,
+          ar: category.ar,
+          en: category.en,
+          bn: category.bn,
+          de: category.de,
+          es: category.es,
+          ff: category.ff,
+          fr: category.fr,
+          hi: category.hi,
+          idd: category.idd,
+          it: category.it,
+          pp: category.pp,
+          ru: category.ru,
+          ur: category.ur,
+          md: category.md
+        }
+      });
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const handleClose = () => {
@@ -357,60 +406,69 @@ const CategoriesListResults = ({ customers, ...rest }) => {
           >
             <div className={classes.paper}>
               <form
-                onSubmit={(event) => handleEditSubmit(event)}
+                onSubmit={formik.handleSubmit}
                 className={classes.root}
                 noValidate
                 autoComplete="off"
               >
                 <Grid container spacing={2}>
-                  <Grid item md={12}>
+                  <Grid item md={3}>
                     <Button
+                      color={
+                        formik.errors.icon && formik.touched.icon
+                          ? 'error'
+                          : 'primary'
+                      }
                       style={{ height: '50px' }}
                       fullWidth
                       variant="outlined"
                       component="label"
                     >
-                      {updateIcon ? 'Selected' : 'Update Icon'}
+                      {!updateIcon ? 'Update Icon' : 'Selected'}
                       <input
-                        onChange={(e) => {
-                          setEditCat({
-                            ...editCat,
-                            icon: e.target.files[0]
-                          });
-                          setUpdateIcon(true);
-                        }}
+                        onChange={(event) =>
+                          handleIconChange(event.target.files)
+                        }
                         encType="multipart/form-data"
                         type="file"
-                        id="update-upload-icon"
+                        id="icon"
                         multiple={false}
-                        name="category-icon"
+                        name="icon"
                         accept="image/png, image/jpeg"
                         hidden
                       />
                     </Button>
                   </Grid>
-                  <Grid item md={12}>
+                  <Grid item md={3}>
                     <TextField
-                      onChange={(e) =>
-                        setEditCat({
-                          ...editCat,
-                          name: e.target.value
-                        })
+                      error={
+                        formik.errors.categoryNameEn &&
+                        formik.touched.categoryNameEn
+                          ? true
+                          : false
                       }
-                      value={editCat.name}
+                      onChange={formik.handleChange}
+                      value={formik.values.categoryNameEn}
                       fullWidth
-                      name="update-category-name"
-                      label="Category Name"
+                      name="categoryNameEn"
+                      label="Category Name (En)"
                     />
                   </Grid>
-                  <Grid item md={6}>
+                  <Grid item md={3}>
                     <SelectComponent
+                      error={
+                        formik.errors.categoryType &&
+                        formik.touched.categoryType
+                          ? true
+                          : false
+                      }
                       inputLabel="Type"
-                      handleOnSelect={handleSelectType}
-                      value={editCat.type}
+                      onChange={formik.handleChange}
+                      value={formik.values.categoryType}
+                      name="categoryType"
                     />
                   </Grid>
-                  <Grid item md={6}>
+                  <Grid item md={3}>
                     <input
                       type="color"
                       style={{
@@ -421,13 +479,136 @@ const CategoriesListResults = ({ customers, ...rest }) => {
                         borderRadius: '4px',
                         overflow: 'hidden'
                       }}
-                      defaultValue={editCat.color || '#000000'}
-                      onChange={(event) =>
-                        setEditCat({ ...editCat, color: event.target.value })
-                      }
+                      defaultValue={formik.values.color}
+                      onChange={formik.handleChange}
+                      name="color"
+                      id="color"
                     ></input>
                   </Grid>
                   <Grid item md={12}>
+                    <Typography variant="h4" align="center">
+                      {' '}
+                      LOCALIZATIONS{' '}
+                    </Typography>
+                  </Grid>
+                  <Grid item md={3}>
+                    <TextField
+                      onChange={formik.handleChange}
+                      value={formik.values.categoryNameAr}
+                      fullWidth
+                      name="categoryNameAr"
+                      label="Arabic"
+                    />
+                  </Grid>
+                  <Grid item md={3}>
+                    <TextField
+                      onChange={formik.handleChange}
+                      value={formik.values.categoryNameFr}
+                      fullWidth
+                      name="categoryNameFr"
+                      label="French"
+                    />
+                  </Grid>
+                  <Grid item md={3}>
+                    <TextField
+                      onChange={formik.handleChange}
+                      value={formik.values.categoryNameBn}
+                      fullWidth
+                      name="categoryNameBn"
+                      label="Bangla/Bengali"
+                    />
+                  </Grid>
+                  <Grid item md={3}>
+                    <TextField
+                      onChange={formik.handleChange}
+                      value={formik.values.categoryNameDe}
+                      fullWidth
+                      name="categoryNameDe"
+                      label="German"
+                    />
+                  </Grid>
+                  <Grid item md={3}>
+                    <TextField
+                      onChange={formik.handleChange}
+                      value={formik.values.categoryNameEs}
+                      fullWidth
+                      name="categoryNameEs"
+                      label="Spanish"
+                    />
+                  </Grid>
+                  <Grid item md={3}>
+                    <TextField
+                      onChange={formik.handleChange}
+                      value={formik.values.categoryNameFf}
+                      fullWidth
+                      name="categoryNameFf"
+                      label="Fulani/Fula"
+                    />
+                  </Grid>
+                  <Grid item md={3}>
+                    <TextField
+                      onChange={formik.handleChange}
+                      value={formik.values.categoryNameHi}
+                      fullWidth
+                      name="categoryNameHi"
+                      label="Hindi"
+                    />
+                  </Grid>
+                  <Grid item md={3}>
+                    <TextField
+                      onChange={formik.handleChange}
+                      value={formik.values.categoryNameIdd}
+                      fullWidth
+                      name="categoryNameIdd"
+                      label="Indonesian"
+                    />
+                  </Grid>
+                  <Grid item md={3}>
+                    <TextField
+                      onChange={formik.handleChange}
+                      value={formik.values.categoryNameIt}
+                      fullWidth
+                      name="categoryNameIt"
+                      label="Italian"
+                    />
+                  </Grid>
+                  <Grid item md={3}>
+                    <TextField
+                      onChange={formik.handleChange}
+                      value={formik.values.categoryNameMd}
+                      fullWidth
+                      name="categoryNameMd"
+                      label="Mandarin Chinese"
+                    />
+                  </Grid>
+                  <Grid item md={3}>
+                    <TextField
+                      onChange={formik.handleChange}
+                      value={formik.values.categoryNamePp}
+                      fullWidth
+                      name="categoryNamePp"
+                      label="Portuguese"
+                    />
+                  </Grid>
+                  <Grid item md={3}>
+                    <TextField
+                      onChange={formik.handleChange}
+                      value={formik.values.categoryNameRu}
+                      fullWidth
+                      name="categoryNameRu"
+                      label="Russian"
+                    />
+                  </Grid>
+                  <Grid item md={3}>
+                    <TextField
+                      onChange={formik.handleChange}
+                      value={formik.values.categoryNameUr}
+                      fullWidth
+                      name="categoryNameUr"
+                      label="Urdu"
+                    />
+                  </Grid>
+                  <Grid item md={9}>
                     <Button
                       type="submit"
                       style={{ height: '50px' }}

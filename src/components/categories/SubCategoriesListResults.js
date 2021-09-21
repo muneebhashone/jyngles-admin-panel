@@ -25,7 +25,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import SelectComponent from '../select/SelectComponent';
 import EditIcon from '@material-ui/icons/Edit';
 import getInitials from 'src/utils/getInitials';
-// import Alert from 'src/components/alert/Alert';
 import uploadToCloudinary from 'src/utils/uploadToCloudinary';
 import {
   editSubCategory as EDIT_SUB_CATEGORY,
@@ -33,9 +32,8 @@ import {
 } from 'src/GraphQL/Mutations';
 import { useMutation } from '@apollo/client';
 import { ToastContainer, toast } from 'react-toastify';
-// import ColorPicker from 'material-ui-color-picker';
-import { MaterialPicker } from 'react-color';
-import { ChromePicker } from 'react-color';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 
 const useStyles = makeStyles((theme) => ({
   title: {
@@ -43,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
   },
   paper: {
     position: 'absolute',
-    width: '30%',
+    width: '80%',
     backgroundColor: theme.palette.background.paper,
     boxShadow: theme.shadows[1],
     padding: theme.spacing(3, 4, 3),
@@ -56,30 +54,62 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
+const EditSubCategorySchema = Yup.object().shape({
+  icon: Yup.string().required('Icon is required'),
+  subCategoryNameEn: Yup.string().required(
+    'Sub Category Name (English) is required'
+  ),
+  subCategoryType: Yup.string().required('Please choose Subcategory type'),
+  color: Yup.string().required('Category color is required')
+});
+
 const SubCategoriesListResults = ({ customers, refetchQuery, ...rest }) => {
   const [selectedCustomerIds, setSelectedCustomerIds] = useState([]);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
-  const [showColor, setShowColor] = useState();
   const [startPoint, setStartPoint] = useState(0);
   const [endPoint, setEndPoint] = useState(0);
   const params = useParams();
-  const [editCat, setEditCat] = useState({
-    id: null,
-    name: null,
-    icon: null,
-    type: null,
-    color: null
-  });
+
+  const classes = useStyles();
+  const [modalOpen, setModalOpen] = useState(false);
   const [updateIcon, setUpdateIcon] = useState(false);
+
+  const formik = useFormik({
+    initialValues: {
+      id: '',
+      icon: '',
+      subCategoryNameEn: '',
+      subCategoryNameAr: '',
+      subCategoryNameBn: '',
+      subCategoryNameDe: '',
+      subCategoryNameEs: '',
+      subCategoryNameFf: '',
+      subCategoryNameFr: '',
+      subCategoryNameHi: '',
+      subCategoryNameIdd: '',
+      subCategoryNameIt: '',
+      subCategoryNamePp: '',
+      subCategoryNameRu: '',
+      subCategoryNameUr: '',
+      subCategoryNameMd: '',
+      subCategoryType: '',
+      color: '#000000'
+    },
+    validationSchema: EditSubCategorySchema,
+    onSubmit: (values) => {
+      console.log(values);
+      handleEditSubmit(values);
+    }
+  });
+
   const [editSubCategory, { data, loading, error }] =
     useMutation(EDIT_SUB_CATEGORY);
   const [
     deleteSubCategory,
     { data: deleteData, loading: deleteLoading, error: deleteError }
   ] = useMutation(DELETE_SUB_CATEGORY);
-  const classes = useStyles();
-  const [modalOpen, setModalOpen] = useState(false);
+
   const notify = () =>
     toast(`Category Updated`, {
       style: {
@@ -88,6 +118,12 @@ const SubCategoriesListResults = ({ customers, refetchQuery, ...rest }) => {
       },
       hideProgressBar: true
     });
+
+  const handleIconChange = (files) => {
+    if (!files) return;
+    formik.setFieldValue('icon', files[0]);
+    setUpdateIcon(true);
+  };
 
   const handleSelectAll = (event) => {
     let newSelectedCustomerIds;
@@ -147,84 +183,83 @@ const SubCategoriesListResults = ({ customers, refetchQuery, ...rest }) => {
   };
 
   const handleEdit = (customer) => {
-    const { _id: id, name, icon, type, color } = customer;
-    setEditCat({ id, name, icon, type, color });
+    console.log(customer);
+
+    formik.setFieldValue('id', customer._id);
+    formik.setFieldValue('subCategoryNameEn', customer.name);
+    formik.setFieldValue('icon', customer.icon);
+    formik.setFieldValue('subCategoryType', customer.type);
+    formik.setFieldValue('color', customer.color);
+    formik.setFieldValue('subCategoryNameAr', customer.ar);
+    formik.setFieldValue('subCategoryNameBn', customer.bn);
+    formik.setFieldValue('subCategoryNameDe', customer.de);
+    formik.setFieldValue('subCategoryNameEs', customer.es);
+    formik.setFieldValue('subCategoryNameFf', customer.ff);
+    formik.setFieldValue('subCategoryNameFr', customer.fr);
+    formik.setFieldValue('subCategoryNameHi', customer.hi);
+    formik.setFieldValue('subCategoryNameIt', customer.it);
+    formik.setFieldValue('subCategoryNameMd', customer.md);
+    formik.setFieldValue('subCategoryNameIdd', customer.idd);
+    formik.setFieldValue('subCategoryNamePp', customer.pp);
+    formik.setFieldValue('subCategoryNameRu', customer.ru);
+    formik.setFieldValue('subCategoryNameUr', customer.ur);
+
     setModalOpen(true);
   };
 
-  const handleEditSubmit = (event) => {
-    event.preventDefault();
+  const handleEditSubmit = async (values) => {
+    try {
+      let subCategoryIcon = values.icon;
 
-    if (editCat.name === '' || editCat.name === null) {
-      alert('Category name should not be empty');
-      return;
-    }
-
-    if (!updateIcon) {
-      const updateCategoryWithoutIcon = async () => {
-        try {
-          const response = await editSubCategory({
-            variables: {
-              id: String(editCat.id),
-              name: editCat.name,
-              icon: editCat.icon,
-              type: editCat.type,
-              color: editCat.color || '#000000',
-              parent_cat_id: params.id
-            }
-          });
-          notify();
-          refetchQuery();
-        } catch (err) {
-          console.log(err);
-        }
-      };
-      updateCategoryWithoutIcon();
-    }
-
-    if (updateIcon) {
-      const updateCategoryWithIcon = async () => {
-        try {
-          const uploadLink = await uploadToCloudinary(editCat.icon);
-
-          const resp = await editSubCategory({
-            variables: {
-              id: String(editCat.id),
-              name: editCat.name,
-              icon: uploadLink,
-              type: editCat.type,
-              color: editCat.color || '#000000',
-              parent_cat_id: params.id
-            }
-          });
-          notify();
-          refetchQuery();
-        } catch (err) {
-          console.log(err);
-        }
-      };
-      updateCategoryWithIcon();
-    }
-  };
-
-  const handleSelectType = (value) => {
-    setEditCat({ ...editCat, type: value });
-  };
-
-  const handleCategoryStatus = (category) => {
-    const updateCategoryStatus = async () => {
-      try {
-        const response = await deleteSubCategory({
-          variables: {
-            id: category._id
-          }
-        });
-        refetchQuery();
-      } catch (err) {
-        console.log(err);
+      if (updateIcon) {
+        subCategoryIcon = await uploadToCloudinary(values.icon);
       }
-    };
-    updateCategoryStatus();
+
+      const resp = await editSubCategory({
+        variables: {
+          id: values.id,
+          name: values.subCategoryNameEn,
+          ar: values.subCategoryNameAr,
+          en: values.subCategoryNameEn,
+          bn: values.subCategoryNameBn,
+          de: values.subCategoryNameDe,
+          es: values.subCategoryNameEs,
+          ff: values.subCategoryNameFf,
+          fr: values.subCategoryNameFr,
+          hi: values.subCategoryNameHi,
+          idd: values.subCategoryNameIdd,
+          it: values.subCategoryNameIt,
+          pp: values.subCategoryNamePp,
+          ru: values.subCategoryNameRu,
+          ur: values.subCategoryNameUr,
+          md: values.subCategoryNameMd,
+          icon: subCategoryIcon,
+          type: values.subCategoryType,
+          color: values.color,
+          parent_cat_id: params.id
+        }
+      });
+
+      if (resp.data.editSubCategory.subCats) {
+        notify();
+        refetchQuery();
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleCategoryStatus = async (category) => {
+    try {
+      await deleteSubCategory({
+        variables: {
+          id: category._id
+        }
+      });
+      refetchQuery();
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const handleClose = () => {
@@ -364,60 +399,69 @@ const SubCategoriesListResults = ({ customers, refetchQuery, ...rest }) => {
           >
             <div className={classes.paper}>
               <form
-                onSubmit={(event) => handleEditSubmit(event)}
+                onSubmit={formik.handleSubmit}
                 className={classes.root}
                 noValidate
                 autoComplete="off"
               >
                 <Grid container spacing={2}>
-                  <Grid item md={12}>
+                  <Grid item md={3}>
                     <Button
+                      color={
+                        formik.errors.icon && formik.touched.icon
+                          ? 'error'
+                          : 'primary'
+                      }
                       style={{ height: '50px' }}
                       fullWidth
                       variant="outlined"
                       component="label"
                     >
-                      {updateIcon ? 'Selected' : 'Update Icon'}
+                      {!updateIcon ? 'Update Icon' : 'Selected'}
                       <input
-                        onChange={(e) => {
-                          setEditCat({
-                            ...editCat,
-                            icon: e.target.files[0]
-                          });
-                          setUpdateIcon(true);
-                        }}
+                        onChange={(event) =>
+                          handleIconChange(event.target.files)
+                        }
                         encType="multipart/form-data"
                         type="file"
-                        id="update-upload-icon"
+                        id="icon"
                         multiple={false}
-                        name="category-icon"
+                        name="icon"
                         accept="image/png, image/jpeg"
                         hidden
                       />
                     </Button>
                   </Grid>
-                  <Grid item md={12}>
+                  <Grid item md={3}>
                     <TextField
-                      onChange={(e) =>
-                        setEditCat({
-                          ...editCat,
-                          name: e.target.value
-                        })
+                      error={
+                        formik.errors.subCategoryNameEn &&
+                        formik.touched.subCategoryNameEn
+                          ? true
+                          : false
                       }
-                      value={editCat.name}
+                      onChange={formik.handleChange}
+                      value={formik.values.subCategoryNameEn}
                       fullWidth
-                      name="update-category-name"
-                      label="Category Name"
+                      name="subCategoryNameEn"
+                      label="Category Name (En)"
                     />
                   </Grid>
-                  <Grid item md={6}>
+                  <Grid item md={3}>
                     <SelectComponent
+                      error={
+                        formik.errors.subCategoryType &&
+                        formik.touched.subCategoryType
+                          ? true
+                          : false
+                      }
                       inputLabel="Type"
-                      handleOnSelect={handleSelectType}
-                      value={editCat.type}
+                      onChange={formik.handleChange}
+                      value={formik.values.subCategoryType}
+                      name="subCategoryType"
                     />
                   </Grid>
-                  <Grid item md={6}>
+                  <Grid item md={3}>
                     <input
                       type="color"
                       style={{
@@ -428,20 +472,143 @@ const SubCategoriesListResults = ({ customers, refetchQuery, ...rest }) => {
                         borderRadius: '4px',
                         overflow: 'hidden'
                       }}
-                      defaultValue={editCat.color || '#000000'}
-                      onChange={(event) =>
-                        setEditCat({ ...editCat, color: event.target.value })
-                      }
+                      defaultValue={formik.values.color}
+                      onChange={formik.handleChange}
+                      name="color"
+                      id="color"
                     ></input>
                   </Grid>
                   <Grid item md={12}>
+                    <Typography variant="h4" align="center">
+                      {' '}
+                      LOCALIZATIONS{' '}
+                    </Typography>
+                  </Grid>
+                  <Grid item md={3}>
+                    <TextField
+                      onChange={formik.handleChange}
+                      value={formik.values.subCategoryNameAr}
+                      fullWidth
+                      name="subCategoryNameAr"
+                      label="Arabic"
+                    />
+                  </Grid>
+                  <Grid item md={3}>
+                    <TextField
+                      onChange={formik.handleChange}
+                      value={formik.values.subCategoryNameFr}
+                      fullWidth
+                      name="subCategoryNameFr"
+                      label="French"
+                    />
+                  </Grid>
+                  <Grid item md={3}>
+                    <TextField
+                      onChange={formik.handleChange}
+                      value={formik.values.subCategoryNameBn}
+                      fullWidth
+                      name="subCategoryNameBn"
+                      label="Bangla/Bengali"
+                    />
+                  </Grid>
+                  <Grid item md={3}>
+                    <TextField
+                      onChange={formik.handleChange}
+                      value={formik.values.subCategoryNameDe}
+                      fullWidth
+                      name="subCategoryNameDe"
+                      label="German"
+                    />
+                  </Grid>
+                  <Grid item md={3}>
+                    <TextField
+                      onChange={formik.handleChange}
+                      value={formik.values.subCategoryNameEs}
+                      fullWidth
+                      name="subCategoryNameEs"
+                      label="Spanish"
+                    />
+                  </Grid>
+                  <Grid item md={3}>
+                    <TextField
+                      onChange={formik.handleChange}
+                      value={formik.values.subCategoryNameFf}
+                      fullWidth
+                      name="subCategoryNameFf"
+                      label="Fulani/Fula"
+                    />
+                  </Grid>
+                  <Grid item md={3}>
+                    <TextField
+                      onChange={formik.handleChange}
+                      value={formik.values.subCategoryNameHi}
+                      fullWidth
+                      name="subCategoryNameHi"
+                      label="Hindi"
+                    />
+                  </Grid>
+                  <Grid item md={3}>
+                    <TextField
+                      onChange={formik.handleChange}
+                      value={formik.values.subCategoryNameIdd}
+                      fullWidth
+                      name="subCategoryNameIdd"
+                      label="Indonesian"
+                    />
+                  </Grid>
+                  <Grid item md={3}>
+                    <TextField
+                      onChange={formik.handleChange}
+                      value={formik.values.subCategoryNameIt}
+                      fullWidth
+                      name="subCategoryNameIt"
+                      label="Italian"
+                    />
+                  </Grid>
+                  <Grid item md={3}>
+                    <TextField
+                      onChange={formik.handleChange}
+                      value={formik.values.subCategoryNameMd}
+                      fullWidth
+                      name="subCategoryNameMd"
+                      label="Mandarin Chinese"
+                    />
+                  </Grid>
+                  <Grid item md={3}>
+                    <TextField
+                      onChange={formik.handleChange}
+                      value={formik.values.subCategoryNamePp}
+                      fullWidth
+                      name="subCategoryNamePp"
+                      label="Portuguese"
+                    />
+                  </Grid>
+                  <Grid item md={3}>
+                    <TextField
+                      onChange={formik.handleChange}
+                      value={formik.values.subCategoryNameRu}
+                      fullWidth
+                      name="subCategoryNameRu"
+                      label="Russian"
+                    />
+                  </Grid>
+                  <Grid item md={3}>
+                    <TextField
+                      onChange={formik.handleChange}
+                      value={formik.values.subCategoryNameUr}
+                      fullWidth
+                      name="subCategoryNameUr"
+                      label="Urdu"
+                    />
+                  </Grid>
+                  <Grid item md={9}>
                     <Button
                       type="submit"
                       style={{ height: '50px' }}
                       fullWidth
                       variant="contained"
                     >
-                      Update Category
+                      Update Sub Category
                     </Button>
                   </Grid>
                 </Grid>
