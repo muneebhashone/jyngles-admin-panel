@@ -98,7 +98,6 @@ const SubCategoriesListResults = ({ customers, refetchQuery, ...rest }) => {
     },
     validationSchema: EditSubCategorySchema,
     onSubmit: (values) => {
-      console.log(values);
       handleEditSubmit(values);
     }
   });
@@ -183,8 +182,6 @@ const SubCategoriesListResults = ({ customers, refetchQuery, ...rest }) => {
   };
 
   const handleEdit = (customer) => {
-    console.log(customer);
-
     formik.setFieldValue('id', customer._id);
     formik.setFieldValue('subCategoryNameEn', customer.name);
     formik.setFieldValue('icon', customer.icon);

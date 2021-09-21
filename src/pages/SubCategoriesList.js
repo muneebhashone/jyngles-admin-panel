@@ -22,7 +22,6 @@ const SubCategoriesList = () => {
   };
 
   useEffect(() => {
-    console.log(newData);
     if (!loading && newData && !newData[0]) {
       navigate('/admin/categories');
     }
