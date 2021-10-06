@@ -364,3 +364,25 @@ export const deleteSubCategory = gql`
     }
   }
 `;
+
+export const editSubCategoryStatus = gql`
+  mutation editSubCategoryStatus($id: String!, $is_active: Boolean) {
+    editSubCategoryStatus(
+      editSubCategoryStatusInput: { id: $id, is_active: $is_active }
+    ) {
+      _id
+      name
+    }
+  }
+`;
+
+export const editCategoryStatus = gql`
+  mutation editCategoryStatus($id: String!, $is_active: Boolean) {
+    editCategoryStatus(
+      editCategoryStatusInput: { id: $id, is_active: $is_active }
+    ) {
+      _id
+      name
+    }
+  }
+`;

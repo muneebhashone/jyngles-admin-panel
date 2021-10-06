@@ -27,7 +27,10 @@ import SelectComponent from '../select/SelectComponent';
 import EditIcon from '@material-ui/icons/Edit';
 import getInitials from 'src/utils/getInitials';
 import uploadToCloudinary from 'src/utils/uploadToCloudinary';
-import { editCategory as EDIT_CATEGORY } from 'src/GraphQL/Mutations';
+import {
+  editCategory as EDIT_CATEGORY,
+  editCategoryStatus as EDIT_CATEGORY_STATUS
+} from 'src/GraphQL/Mutations';
 import { useMutation } from '@apollo/client';
 import { ToastContainer, toast } from 'react-toastify';
 import { useFormik } from 'formik';
@@ -90,9 +93,19 @@ const CategoriesListResults = ({ customers, refetchQuery, ...rest }) => {
     },
     validationSchema: EditCategorySchema,
     onSubmit: (values) => {
+      console.log(values);
       handleEditSubmit(values);
     }
   });
+
+  const [
+    editCategory,
+    { loading: editCategoryLoading, error: editCategoryError }
+  ] = useMutation(EDIT_CATEGORY);
+  const [
+    editCategoryStatus,
+    { loading: editCategoryStatusLoading, error: editCategoryStatusError }
+  ] = useMutation(EDIT_CATEGORY_STATUS);
 
   const handleIconChange = (files) => {
     if (!files) return;
@@ -100,7 +113,6 @@ const CategoriesListResults = ({ customers, refetchQuery, ...rest }) => {
     setUpdateIcon(true);
   };
 
-  const [editCategory, { data, loading, error }] = useMutation(EDIT_CATEGORY);
   const classes = useStyles();
   const [modalOpen, setModalOpen] = useState(false);
   const location = useLocation();
@@ -171,8 +183,6 @@ const CategoriesListResults = ({ customers, refetchQuery, ...rest }) => {
   };
 
   const handleEdit = (customer) => {
-    console.log(customer);
-
     formik.setFieldValue('id', customer._id);
     formik.setFieldValue('categoryNameEn', customer.name);
     formik.setFieldValue('icon', customer.icon);
@@ -223,7 +233,7 @@ const CategoriesListResults = ({ customers, refetchQuery, ...rest }) => {
           md: values.categoryNameMd,
           icon: categoryIcon,
           type: values.categoryType,
-          color: values.color
+          color: values.color || '#000000'
         }
       });
 
@@ -238,30 +248,14 @@ const CategoriesListResults = ({ customers, refetchQuery, ...rest }) => {
 
   const handleCategoryStatus = async (category) => {
     try {
-      await editCategory({
+      const resp = await editCategoryStatus({
         variables: {
           id: category._id,
-          name: category.name,
-          icon: category.icon,
-          is_active: !category.is_active,
-          color: category.color,
-          type: category.type,
-          ar: category.ar,
-          en: category.en,
-          bn: category.bn,
-          de: category.de,
-          es: category.es,
-          ff: category.ff,
-          fr: category.fr,
-          hi: category.hi,
-          idd: category.idd,
-          it: category.it,
-          pp: category.pp,
-          ru: category.ru,
-          ur: category.ur,
-          md: category.md
+          is_active: !category.is_active
         }
       });
+
+      refetchQuery();
     } catch (err) {
       console.log(err);
     }

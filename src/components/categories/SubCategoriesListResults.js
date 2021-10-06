@@ -28,7 +28,8 @@ import getInitials from 'src/utils/getInitials';
 import uploadToCloudinary from 'src/utils/uploadToCloudinary';
 import {
   editSubCategory as EDIT_SUB_CATEGORY,
-  deleteSubCategory as DELETE_SUB_CATEGORY
+  deleteSubCategory as DELETE_SUB_CATEGORY,
+  editSubCategoryStatus as EDIT_SUB_CATEGORY_STATUS
 } from 'src/GraphQL/Mutations';
 import { useMutation } from '@apollo/client';
 import { ToastContainer, toast } from 'react-toastify';
@@ -102,12 +103,9 @@ const SubCategoriesListResults = ({ customers, refetchQuery, ...rest }) => {
     }
   });
 
-  const [editSubCategory, { data, loading, error }] =
-    useMutation(EDIT_SUB_CATEGORY);
-  const [
-    deleteSubCategory,
-    { data: deleteData, loading: deleteLoading, error: deleteError }
-  ] = useMutation(DELETE_SUB_CATEGORY);
+  const [editSubCategory] = useMutation(EDIT_SUB_CATEGORY);
+  const [deleteSubCategory] = useMutation(DELETE_SUB_CATEGORY);
+  const [editSubCategoryStatus] = useMutation(EDIT_SUB_CATEGORY_STATUS);
 
   const notify = () =>
     toast(`Category Updated`, {
@@ -259,6 +257,20 @@ const SubCategoriesListResults = ({ customers, refetchQuery, ...rest }) => {
     }
   };
 
+  const handleActiveOrDisable = async (category) => {
+    try {
+      await editSubCategoryStatus({
+        variables: {
+          id: category._id,
+          is_active: !category.is_active
+        }
+      });
+      refetchQuery();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const handleClose = () => {
     setModalOpen(false);
   };
@@ -383,6 +395,9 @@ const SubCategoriesListResults = ({ customers, refetchQuery, ...rest }) => {
                   <TableCell>
                     <Button onClick={() => handleCategoryStatus(customer)}>
                       Delete
+                    </Button>
+                    <Button onClick={() => handleCategoryStatus(customer)}>
+                      {customer.is_active ? 'Disable' : 'Enable'}
                     </Button>
                   </TableCell>
                 </TableRow>

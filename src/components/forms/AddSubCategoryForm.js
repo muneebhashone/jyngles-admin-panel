@@ -67,7 +67,6 @@ function AddSubCategoryForm({ refetchQuery, onSuccess }) {
     validationSchema: AddSubCategorySchema,
     onSubmit: (values) => {
       handleSubmit(values);
-      console.log(values);
     }
   });
 
@@ -132,6 +131,8 @@ function AddSubCategoryForm({ refetchQuery, onSuccess }) {
           md: values.subCategoryNameMd
         }
       });
+
+      console.log(responseCreate);
 
       if (responseCreate.data.createSubCategory.name) {
         formik.resetForm();

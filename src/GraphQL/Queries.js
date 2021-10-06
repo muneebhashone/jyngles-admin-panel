@@ -64,6 +64,7 @@ export const getCategory = gql`
         type
         icon
         color
+        is_active
         ar
         bn
         de
