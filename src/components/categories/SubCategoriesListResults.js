@@ -393,10 +393,7 @@ const SubCategoriesListResults = ({ customers, refetchQuery, ...rest }) => {
                     </IconButton>
                   </TableCell>
                   <TableCell>
-                    <Button onClick={() => handleCategoryStatus(customer)}>
-                      Delete
-                    </Button>
-                    <Button onClick={() => handleCategoryStatus(customer)}>
+                    <Button onClick={() => handleActiveOrDisable(customer)}>
                       {customer.is_active ? 'Disable' : 'Enable'}
                     </Button>
                   </TableCell>
